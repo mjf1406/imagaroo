@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { FileImage, Loader2, Upload } from 'lucide-react'
+import { FileImage, Loader2, Trash2, Upload } from 'lucide-react'
 import type { ImageFile } from '@/components/ImagePreview'
 import { ImagePreview } from '@/components/ImagePreview'
 import { Button } from '@/components/ui/button'
@@ -94,6 +94,14 @@ function ConvertImagePage() {
         URL.revokeObjectURL(image.preview)
       }
       return prev.filter((img) => img.id !== id)
+    })
+  }, [])
+
+  const clearAllImages = useCallback(() => {
+    setImages((prev) => {
+      // Revoke all preview URLs to prevent memory leaks
+      prev.forEach((img) => URL.revokeObjectURL(img.preview))
+      return []
     })
   }, [])
 
@@ -247,16 +255,27 @@ function ConvertImagePage() {
             <h2 className="text-xl font-semibold">
               {images.length} image{images.length !== 1 ? 's' : ''} ready
             </h2>
-            <Button onClick={handleConvert} disabled={isConverting} size="lg">
-              {isConverting ? (
-                <>
-                  <Loader2 className="size-4 mr-2 animate-spin" />
-                  Converting... {Math.round(conversionProgress)}%
-                </>
-              ) : (
-                'Convert & Download'
-              )}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={clearAllImages}
+                disabled={isConverting}
+                variant="outline"
+                size="lg"
+              >
+                <Trash2 className="size-4 mr-2" />
+                Clear All
+              </Button>
+              <Button onClick={handleConvert} disabled={isConverting} size="lg">
+                {isConverting ? (
+                  <>
+                    <Loader2 className="size-4 mr-2 animate-spin" />
+                    Converting... {Math.round(conversionProgress)}%
+                  </>
+                ) : (
+                  'Convert & Download'
+                )}
+              </Button>
+            </div>
           </div>
 
           {isConverting && (
