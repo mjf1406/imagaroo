@@ -1,7 +1,7 @@
 /**
  * Converts an image file to a different format using the Canvas API
  * @param file - The image file to convert
- * @param targetFormat - The target format (jpg, jpeg, webp, avif, png)
+ * @param targetFormat - The target format (jpg, jpeg, webp, avif, png, ico)
  * @param quality - Quality for lossy formats (0-1, default: 0.92)
  * @returns Promise that resolves to a Blob of the converted image
  */
@@ -49,6 +49,11 @@ export async function convertImage(
             outputFormat = 'avif'
             break
           case 'png':
+            mimeType = 'image/png'
+            outputFormat = 'png'
+            break
+          case 'ico':
+            // ICO files use PNG format internally for single-size icons
             mimeType = 'image/png'
             outputFormat = 'png'
             break
@@ -113,9 +118,9 @@ export function changeFileExtension(
  * Validates if a file is a supported image type
  */
 export function isValidImageType(file: File): boolean {
-  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif']
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif', 'image/x-icon', 'image/vnd.microsoft.icon']
   const extension = getFileExtension(file.name).toLowerCase()
-  const validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'avif']
+  const validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'ico']
 
   return validTypes.includes(file.type) || validExtensions.includes(extension)
 }

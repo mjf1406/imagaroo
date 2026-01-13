@@ -24,7 +24,7 @@ export const Route = createFileRoute('/convert-image')({
   component: ConvertImagePage,
 })
 
-const SUPPORTED_FORMATS = ['jpg', 'jpeg', 'webp', 'avif', 'png']
+const SUPPORTED_FORMATS = ['jpg', 'jpeg', 'webp', 'avif', 'png', 'ico']
 
 function ConvertImagePage() {
   const [images, setImages] = useState<Array<ImageFile>>([])
@@ -234,7 +234,7 @@ function ConvertImagePage() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Supported formats: JPG, JPEG, PNG, WEBP, AVIF
+              Supported formats: JPG, JPEG, PNG, WEBP, AVIF, ICO
             </p>
           </div>
         </CardContent>

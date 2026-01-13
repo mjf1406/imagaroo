@@ -1,4 +1,4 @@
-Mr. Monkey's Image Tools
+# Imagaroo - Image Tools
 
 ## Links
 
@@ -7,3 +7,7 @@ Mr. Monkey's Image Tools
 ## Change Log
 
 ### 2026/01/13
+
+- UX: added theme switcher
+- UI: added navbar
+- UI: added logo
