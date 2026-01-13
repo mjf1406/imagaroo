@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 interface GlobalFormatSelectorProps {
   value: string
   onChange: (value: string) => void
-  supportedFormats: string[]
+  supportedFormats: Array<string>
 }
 
 export function GlobalFormatSelector({
@@ -51,7 +51,8 @@ export function GlobalFormatSelector({
         </RadioGroup>
       </div>
       <span className="text-sm text-muted-foreground">
-        This format will be applied to all images unless overridden
+        Choose PNG for the best quality, JPG for compatibility, or WEBP for
+        smaller file sizes.
       </span>
     </div>
   )

@@ -9,7 +9,7 @@ import type { ImageFile } from '@/components/ImagePreview'
 
 const SUPPORTED_FORMATS = ['jpg', 'png', 'webp', 'avif', 'ico']
 
-export const Route = createFileRoute('/convert-image/')({
+export const Route = createFileRoute('/convert/')({
   component: ConvertImagePage,
 })
 
@@ -49,27 +49,39 @@ function ConvertImagePage() {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <ConvertImagePageHeader />
-      <FileUploadArea onFilesAdded={handleFilesAdded} />
+      {/* Flex row layout on md+ screens */}
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Left side: File upload area */}
+        <div className="flex-1">
+          <FileUploadArea onFilesAdded={handleFilesAdded} />
+        </div>
+        {/* Right side: Controls (only show when images exist) */}
+        {images.length > 0 && (
+          <div className="md:w-80 md:shrink-0">
+            <div className="space-y-4">
+              <GlobalFormatSelector
+                value={globalFormat}
+                onChange={setGlobalFormat}
+                supportedFormats={SUPPORTED_FORMATS}
+              />
+              <ConvertActions
+                images={images}
+                globalFormat={globalFormat}
+                onClear={handleClear}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Image preview grid */}
       {images.length > 0 && (
-        <>
-          <GlobalFormatSelector
-            value={globalFormat}
-            onChange={setGlobalFormat}
-            supportedFormats={SUPPORTED_FORMATS}
-          />
-          <ImagePreviewGrid
-            images={images}
-            globalFormat={globalFormat}
-            onRemove={handleRemove}
-            onFormatChange={handleFormatChange}
-            supportedFormats={SUPPORTED_FORMATS}
-          />
-          <ConvertActions
-            images={images}
-            globalFormat={globalFormat}
-            onClear={handleClear}
-          />
-        </>
+        <ImagePreviewGrid
+          images={images}
+          globalFormat={globalFormat}
+          onRemove={handleRemove}
+          onFormatChange={handleFormatChange}
+          supportedFormats={SUPPORTED_FORMATS}
+        />
       )}
     </div>
   )

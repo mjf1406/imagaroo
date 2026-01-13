@@ -10,53 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CropImageIndexRouteImport } from './routes/crop-image/index'
-import { Route as ConvertImageIndexRouteImport } from './routes/convert-image/index'
+import { Route as RemoveIndexRouteImport } from './routes/remove/index'
+import { Route as CropIndexRouteImport } from './routes/crop/index'
+import { Route as ConvertIndexRouteImport } from './routes/convert/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CropImageIndexRoute = CropImageIndexRouteImport.update({
-  id: '/crop-image/',
-  path: '/crop-image/',
+const RemoveIndexRoute = RemoveIndexRouteImport.update({
+  id: '/remove/',
+  path: '/remove/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ConvertImageIndexRoute = ConvertImageIndexRouteImport.update({
-  id: '/convert-image/',
-  path: '/convert-image/',
+const CropIndexRoute = CropIndexRouteImport.update({
+  id: '/crop/',
+  path: '/crop/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConvertIndexRoute = ConvertIndexRouteImport.update({
+  id: '/convert/',
+  path: '/convert/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/convert-image': typeof ConvertImageIndexRoute
-  '/crop-image': typeof CropImageIndexRoute
+  '/convert': typeof ConvertIndexRoute
+  '/crop': typeof CropIndexRoute
+  '/remove': typeof RemoveIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/convert-image': typeof ConvertImageIndexRoute
-  '/crop-image': typeof CropImageIndexRoute
+  '/convert': typeof ConvertIndexRoute
+  '/crop': typeof CropIndexRoute
+  '/remove': typeof RemoveIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/convert-image/': typeof ConvertImageIndexRoute
-  '/crop-image/': typeof CropImageIndexRoute
+  '/convert/': typeof ConvertIndexRoute
+  '/crop/': typeof CropIndexRoute
+  '/remove/': typeof RemoveIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/convert-image' | '/crop-image'
+  fullPaths: '/' | '/convert' | '/crop' | '/remove'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/convert-image' | '/crop-image'
-  id: '__root__' | '/' | '/convert-image/' | '/crop-image/'
+  to: '/' | '/convert' | '/crop' | '/remove'
+  id: '__root__' | '/' | '/convert/' | '/crop/' | '/remove/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ConvertImageIndexRoute: typeof ConvertImageIndexRoute
-  CropImageIndexRoute: typeof CropImageIndexRoute
+  ConvertIndexRoute: typeof ConvertIndexRoute
+  CropIndexRoute: typeof CropIndexRoute
+  RemoveIndexRoute: typeof RemoveIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,18 +78,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/crop-image/': {
-      id: '/crop-image/'
-      path: '/crop-image'
-      fullPath: '/crop-image'
-      preLoaderRoute: typeof CropImageIndexRouteImport
+    '/remove/': {
+      id: '/remove/'
+      path: '/remove'
+      fullPath: '/remove'
+      preLoaderRoute: typeof RemoveIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/convert-image/': {
-      id: '/convert-image/'
-      path: '/convert-image'
-      fullPath: '/convert-image'
-      preLoaderRoute: typeof ConvertImageIndexRouteImport
+    '/crop/': {
+      id: '/crop/'
+      path: '/crop'
+      fullPath: '/crop'
+      preLoaderRoute: typeof CropIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/convert/': {
+      id: '/convert/'
+      path: '/convert'
+      fullPath: '/convert'
+      preLoaderRoute: typeof ConvertIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,8 +104,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ConvertImageIndexRoute: ConvertImageIndexRoute,
-  CropImageIndexRoute: CropImageIndexRoute,
+  ConvertIndexRoute: ConvertIndexRoute,
+  CropIndexRoute: CropIndexRoute,
+  RemoveIndexRoute: RemoveIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

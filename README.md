@@ -6,8 +6,16 @@
 
 ## Change Log
 
+- FT: feature
+- UX: user experience
+- UI: user interface
+- DX: developer experience
+- BE: backend
+- BUG: bug
+
 ### 2026/01/13
 
+- FT: added remove bg feature
 - UX: added theme switcher
 - UI: added navbar
 - UI: added logo

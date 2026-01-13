@@ -24,7 +24,7 @@ export function ImagePreviewGrid({
       <h2 className="text-xl font-semibold mb-4">
         Images ({images.length})
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2">
         {images.map((image) => (
           <ImagePreview
             key={image.id}
