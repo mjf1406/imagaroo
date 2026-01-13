@@ -17,7 +17,7 @@ export default function Navbar() {
           className="h-12 w-auto"
         />
         <img
-          src="/brand/imagaroo-text-2.webp"
+          src="/brand/imagaroo-text.webp"
           alt="Imagaroo"
           className="h-12 w-auto hidden sm:block"
         />
