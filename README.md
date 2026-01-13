@@ -15,6 +15,7 @@
 
 ### 2026/01/13
 
+- BE: added flood fill algorithm to remove bg to prevent the bg color from being replaced with transparency within the content of the image
 - BUG: copper preview no longer fails to show the correct preview with tolerances of 4 or smaller
 - BE: added debouncer to remove bg preview
 - UX: combined crop and remove bg pages into one new page, Transform
