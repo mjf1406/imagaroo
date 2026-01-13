@@ -11,3 +11,4 @@
 - UX: added theme switcher
 - UI: added navbar
 - UI: added logo
+- DX: componentized the convert image page

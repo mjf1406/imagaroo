@@ -9,72 +9,58 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CropImageRouteImport } from './routes/crop-image'
-import { Route as ConvertImageRouteImport } from './routes/convert-image'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CropImageIndexRouteImport } from './routes/crop-image/index'
+import { Route as ConvertImageIndexRouteImport } from './routes/convert-image/index'
 
-const CropImageRoute = CropImageRouteImport.update({
-  id: '/crop-image',
-  path: '/crop-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConvertImageRoute = ConvertImageRouteImport.update({
-  id: '/convert-image',
-  path: '/convert-image',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CropImageIndexRoute = CropImageIndexRouteImport.update({
+  id: '/crop-image/',
+  path: '/crop-image/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConvertImageIndexRoute = ConvertImageIndexRouteImport.update({
+  id: '/convert-image/',
+  path: '/convert-image/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/convert-image': typeof ConvertImageRoute
-  '/crop-image': typeof CropImageRoute
+  '/convert-image': typeof ConvertImageIndexRoute
+  '/crop-image': typeof CropImageIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/convert-image': typeof ConvertImageRoute
-  '/crop-image': typeof CropImageRoute
+  '/convert-image': typeof ConvertImageIndexRoute
+  '/crop-image': typeof CropImageIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/convert-image': typeof ConvertImageRoute
-  '/crop-image': typeof CropImageRoute
+  '/convert-image/': typeof ConvertImageIndexRoute
+  '/crop-image/': typeof CropImageIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/convert-image' | '/crop-image'
   fileRoutesByTo: FileRoutesByTo
   to: '/' | '/convert-image' | '/crop-image'
-  id: '__root__' | '/' | '/convert-image' | '/crop-image'
+  id: '__root__' | '/' | '/convert-image/' | '/crop-image/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ConvertImageRoute: typeof ConvertImageRoute
-  CropImageRoute: typeof CropImageRoute
+  ConvertImageIndexRoute: typeof ConvertImageIndexRoute
+  CropImageIndexRoute: typeof CropImageIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/crop-image': {
-      id: '/crop-image'
-      path: '/crop-image'
-      fullPath: '/crop-image'
-      preLoaderRoute: typeof CropImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/convert-image': {
-      id: '/convert-image'
-      path: '/convert-image'
-      fullPath: '/convert-image'
-      preLoaderRoute: typeof ConvertImageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -82,13 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/crop-image/': {
+      id: '/crop-image/'
+      path: '/crop-image'
+      fullPath: '/crop-image'
+      preLoaderRoute: typeof CropImageIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/convert-image/': {
+      id: '/convert-image/'
+      path: '/convert-image'
+      fullPath: '/convert-image'
+      preLoaderRoute: typeof ConvertImageIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ConvertImageRoute: ConvertImageRoute,
-  CropImageRoute: CropImageRoute,
+  ConvertImageIndexRoute: ConvertImageIndexRoute,
+  CropImageIndexRoute: CropImageIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
