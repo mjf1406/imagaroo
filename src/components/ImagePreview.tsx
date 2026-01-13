@@ -21,7 +21,7 @@ interface ImagePreviewProps {
   globalFormat: string
   onRemove: (id: string) => void
   onFormatChange: (id: string, format: string | null) => void
-  supportedFormats: string[]
+  supportedFormats: Array<string>
 }
 
 export function ImagePreview({
