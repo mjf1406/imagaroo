@@ -6,9 +6,10 @@ import { RemoveImagePageHeader } from './-components/RemoveImagePageHeader'
 import { RemoveActions } from './-components/RemoveActions'
 import { OutputFormatSelector } from './-components/OutputFormatSelector'
 import { ToleranceSlider } from './-components/ToleranceSlider'
+import { BackgroundRemovedPreview } from './-components/BackgroundRemovedPreview'
 import type { ImageFile } from '@/components/ImagePreview'
 
-const SUPPORTED_FORMATS = ['jpg', 'png', 'webp', 'avif', 'ico']
+const SUPPORTED_FORMATS = ['webp', 'png', 'jpg', 'avif', 'ico']
 
 export const Route = createFileRoute('/remove/')({
   component: RemoveImagePage,
@@ -54,40 +55,50 @@ function RemoveImagePage() {
         <div className="flex-1">
           <FileUploadArea onFilesAdded={handleFilesAdded} />
         </div>
-        {/* Right side: Controls (only show when images exist) */}
-        {images.length > 0 && (
-          <div className="md:w-80 md:shrink-0">
-            <div className="space-y-4">
-              <OutputFormatSelector
-                value={outputFormat}
-                onChange={setOutputFormat}
-              />
-              <ToleranceSlider
-                value={tolerance}
-                onChange={setTolerance}
-                min={0}
-                max={100}
-                step={1}
-              />
-              <RemoveActions
-                images={images}
-                outputFormat={outputFormat}
-                tolerance={tolerance}
-                onClear={handleClear}
-              />
-            </div>
+        {/* Right side: Controls (always visible) */}
+        <div className="md:w-80 md:shrink-0">
+          <div className="space-y-4">
+            <OutputFormatSelector
+              value={outputFormat}
+              onChange={setOutputFormat}
+            />
+            <ToleranceSlider
+              value={tolerance}
+              onChange={setTolerance}
+              min={0}
+              max={100}
+              step={1}
+            />
+            <RemoveActions
+              images={images}
+              outputFormat={outputFormat}
+              tolerance={tolerance}
+              onClear={handleClear}
+            />
           </div>
-        )}
+        </div>
       </div>
+      {/* Preview section - shows first image with background removed */}
+      {images.length > 0 && (
+        <div className="mt-6">
+          <BackgroundRemovedPreview
+            image={images[0]}
+            outputFormat={outputFormat}
+            tolerance={tolerance}
+          />
+        </div>
+      )}
       {/* Image preview grid */}
       {images.length > 0 && (
-        <ImagePreviewGrid
-          images={images}
-          globalFormat={outputFormat}
-          onRemove={handleRemove}
-          onFormatChange={handleFormatChange}
-          supportedFormats={SUPPORTED_FORMATS}
-        />
+        <div className="mt-6">
+          <ImagePreviewGrid
+            images={images}
+            globalFormat={outputFormat}
+            onRemove={handleRemove}
+            onFormatChange={handleFormatChange}
+            supportedFormats={SUPPORTED_FORMATS}
+          />
+        </div>
       )}
     </div>
   )

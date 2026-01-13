@@ -34,8 +34,7 @@ function HomePage() {
               <CardTitle className="text-2xl">Convert Images</CardTitle>
             </div>
             <CardDescription>
-              Convert images between different formats (JPG, PNG, WEBP, AVIF,
-              ICO). Supports bulk conversion with automatic ZIP download.
+              Convert images between different formats (JPG, PNG, WEBP). Supports bulk conversion with automatic ZIP download.
             </CardDescription>
           </CardHeader>
           <CardContent>

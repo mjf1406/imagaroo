@@ -53,15 +53,11 @@ export function RemoveActions({
     }
   }
 
-  if (images.length === 0) {
-    return null
-  }
-
   return (
     <div className="flex gap-4">
       <Button
         onClick={handleRemoveBg}
-        disabled={isRemoving}
+        disabled={isRemoving || images.length === 0}
         size="lg"
         className="flex-1"
       >
@@ -82,7 +78,7 @@ export function RemoveActions({
         onClick={onClear}
         variant="outline"
         size="lg"
-        disabled={isRemoving}
+        disabled={isRemoving || images.length === 0}
       >
         Clear All
       </Button>

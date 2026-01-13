@@ -11,7 +11,7 @@ export function OutputFormatSelector({
   value,
   onChange,
 }: OutputFormatSelectorProps) {
-  const formats: Array<'png' | 'webp'> = ['png', 'webp']
+  const formats: Array<'png' | 'webp'> = ['webp', 'png']
 
   return (
     <div className="mb-6 flex flex-col gap-3">

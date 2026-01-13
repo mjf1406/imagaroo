@@ -51,15 +51,11 @@ export function CropActions({
     }
   }
 
-  if (images.length === 0) {
-    return null
-  }
-
   return (
     <div className="flex gap-4">
       <Button
         onClick={handleCrop}
-        disabled={isCropping}
+        disabled={isCropping || images.length === 0}
         size="lg"
         className="flex-1"
       >
@@ -79,7 +75,7 @@ export function CropActions({
         onClick={onClear}
         variant="outline"
         size="lg"
-        disabled={isCropping}
+        disabled={isCropping || images.length === 0}
       >
         Clear All
       </Button>

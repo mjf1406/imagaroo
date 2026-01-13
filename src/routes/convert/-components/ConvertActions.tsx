@@ -54,15 +54,11 @@ export function ConvertActions({
     }
   }
 
-  if (images.length === 0) {
-    return null
-  }
-
   return (
     <div className="flex gap-4">
       <Button
         onClick={handleConvert}
-        disabled={isConverting}
+        disabled={isConverting || images.length === 0}
         size="lg"
         className="flex-1"
       >
@@ -82,7 +78,7 @@ export function ConvertActions({
         onClick={onClear}
         variant="outline"
         size="lg"
-        disabled={isConverting}
+        disabled={isConverting || images.length === 0}
       >
         Clear All
       </Button>

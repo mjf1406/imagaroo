@@ -7,7 +7,7 @@ import { ImagePreviewGrid } from './-components/ImagePreviewGrid'
 import { ConvertActions } from './-components/ConvertActions'
 import type { ImageFile } from '@/components/ImagePreview'
 
-const SUPPORTED_FORMATS = ['jpg', 'png', 'webp', 'avif', 'ico']
+const SUPPORTED_FORMATS = ['webp', 'png', 'jpg']
 
 export const Route = createFileRoute('/convert/')({
   component: ConvertImagePage,
@@ -55,33 +55,33 @@ function ConvertImagePage() {
         <div className="flex-1">
           <FileUploadArea onFilesAdded={handleFilesAdded} />
         </div>
-        {/* Right side: Controls (only show when images exist) */}
-        {images.length > 0 && (
-          <div className="md:w-80 md:shrink-0">
-            <div className="space-y-4">
-              <GlobalFormatSelector
-                value={globalFormat}
-                onChange={setGlobalFormat}
-                supportedFormats={SUPPORTED_FORMATS}
-              />
-              <ConvertActions
-                images={images}
-                globalFormat={globalFormat}
-                onClear={handleClear}
-              />
-            </div>
+        {/* Right side: Controls (always visible) */}
+        <div className="md:w-80 md:shrink-0">
+          <div className="space-y-4">
+            <GlobalFormatSelector
+              value={globalFormat}
+              onChange={setGlobalFormat}
+              supportedFormats={SUPPORTED_FORMATS}
+            />
+            <ConvertActions
+              images={images}
+              globalFormat={globalFormat}
+              onClear={handleClear}
+            />
           </div>
-        )}
+        </div>
       </div>
-      {/* Image preview grid */}
+      {/* Image preview grid (only show when images exist) */}
       {images.length > 0 && (
-        <ImagePreviewGrid
-          images={images}
-          globalFormat={globalFormat}
-          onRemove={handleRemove}
-          onFormatChange={handleFormatChange}
-          supportedFormats={SUPPORTED_FORMATS}
-        />
+        <div className="mt-6">
+          <ImagePreviewGrid
+            images={images}
+            globalFormat={globalFormat}
+            onRemove={handleRemove}
+            onFormatChange={handleFormatChange}
+            supportedFormats={SUPPORTED_FORMATS}
+          />
+        </div>
       )}
     </div>
   )
