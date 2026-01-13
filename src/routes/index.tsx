@@ -31,10 +31,11 @@ function HomePage() {
               <div className="rounded-lg bg-primary/10 p-2">
                 <ImageIcon className="size-6 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Convert Images</CardTitle>
+              <CardTitle className="text-2xl">Convert</CardTitle>
             </div>
             <CardDescription>
-              Convert images between different formats (JPG, PNG, WEBP). Supports bulk conversion with automatic ZIP download.
+              Convert images between different formats (JPG, PNG, WEBP).
+              Supports bulk conversion with automatic ZIP download.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -52,7 +53,7 @@ function HomePage() {
               <div className="rounded-lg bg-primary/10 p-2">
                 <Sparkles className="size-6 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Transform Images</CardTitle>
+              <CardTitle className="text-2xl">Transform</CardTitle>
             </div>
             <CardDescription>
               Crop images or remove backgrounds. Switch between modes with a
