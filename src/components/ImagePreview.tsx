@@ -8,7 +8,6 @@ import {
   SelectValue,
 } from './ui/select'
 import { Card, CardContent } from './ui/card'
-import { cn } from '@/lib/utils'
 
 export type ImageFile = {
   id: string
@@ -71,11 +70,15 @@ export function ImagePreview({
             >
               <SelectTrigger className="h-6 text-xs w-24">
                 <SelectValue>
-                  {image.outputFormat === null ? 'Global' : currentFormat.toUpperCase()}
+                  {image.outputFormat === null
+                    ? 'Global'
+                    : currentFormat.toUpperCase()}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="global">Global ({globalFormat.toUpperCase()})</SelectItem>
+                <SelectItem value="global">
+                  Global ({globalFormat.toUpperCase()})
+                </SelectItem>
                 {supportedFormats.map((format) => (
                   <SelectItem key={format} value={format}>
                     {format.toUpperCase()}
