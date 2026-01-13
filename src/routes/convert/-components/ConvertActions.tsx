@@ -2,18 +2,20 @@ import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ImageFile } from '@/components/ImagePreview'
-import { convertImage, changeFileExtension } from '@/lib/image-converter'
+import { convertImage, changeFileExtension, hasTransparency, getFileExtension } from '@/lib/image-converter'
 import { createZip, downloadBlob } from '@/lib/zip-utils'
 
 interface ConvertActionsProps {
   images: ImageFile[]
   globalFormat: string
+  backgroundColor?: string
   onClear: () => void
 }
 
 export function ConvertActions({
   images,
   globalFormat,
+  backgroundColor,
   onClear,
 }: ConvertActionsProps) {
   const [isConverting, setIsConverting] = useState(false)
@@ -28,7 +30,28 @@ export function ConvertActions({
 
       for (const image of images) {
         const targetFormat = image.outputFormat ?? globalFormat
-        const blob = await convertImage(image.file, targetFormat)
+        const formatLower = targetFormat.toLowerCase()
+        
+        // Determine if we need to use background color
+        let bgColor: string | undefined
+        if (backgroundColor && (formatLower === 'jpg' || formatLower === 'jpeg')) {
+          // Check if image has transparency and is from WebP/PNG
+          const originalExt = getFileExtension(image.file.name).toLowerCase()
+          if (originalExt === 'webp' || originalExt === 'png') {
+            try {
+              const hasAlpha = await hasTransparency(image.file)
+              if (hasAlpha) {
+                bgColor = backgroundColor
+              }
+            } catch (error) {
+              console.error('Error checking transparency:', error)
+              // Default to using background color if check fails
+              bgColor = backgroundColor
+            }
+          }
+        }
+        
+        const blob = await convertImage(image.file, targetFormat, 0.92, bgColor)
         const newFilename = changeFileExtension(
           image.file.name,
           targetFormat === 'jpeg' ? 'jpg' : targetFormat,
