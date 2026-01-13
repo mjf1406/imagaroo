@@ -41,8 +41,8 @@ export default function Navbar() {
           }}
         >
           <ImageIcon className="size-4" />
-          <span className="hidden sm:inline">Convert</span>
-          <span className="sm:hidden">Convert</span>
+          <span className="hidden md:inline">Convert</span>
+          <span className="sr-only md:hidden">Convert</span>
         </Link>
 
         <Link
@@ -61,8 +61,8 @@ export default function Navbar() {
           }}
         >
           <Sparkles className="size-4" />
-          <span className="hidden sm:inline">Transform</span>
-          <span className="sm:hidden">Transform</span>
+          <span className="hidden md:inline">Transform</span>
+          <span className="sr-only md:hidden">Transform</span>
         </Link>
       </div>
 

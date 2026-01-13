@@ -58,13 +58,15 @@ function TransformImagePage() {
         <div className="flex-1">
           <FileUploadArea onFilesAdded={handleFilesAdded} />
         </div>
-        {/* Middle: Preview section - only for remove mode */}
-        {remove && images.length > 0 && (
+        {/* Middle: Preview section - show if crop or remove is selected */}
+        {(crop || remove) && images.length > 0 && (
           <div className="md:w-80 md:shrink-0">
             <BackgroundRemovedPreview
               image={images[0]}
               outputFormat={outputFormat}
               tolerance={tolerance}
+              crop={crop}
+              remove={remove}
             />
           </div>
         )}
