@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { Crop, ImageIcon } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
-import { ImageIcon, Crop } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
