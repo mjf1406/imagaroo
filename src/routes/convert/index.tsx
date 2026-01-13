@@ -8,7 +8,6 @@ import { ConvertActions } from './-components/ConvertActions'
 import { BackgroundColorPicker } from './-components/BackgroundColorPicker'
 import type { ImageFile } from '@/components/ImagePreview'
 import { getFileExtension, hasTransparency } from '@/lib/image-converter'
-import { Button } from '@/components/ui/button'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg']
 
