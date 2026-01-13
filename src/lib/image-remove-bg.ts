@@ -117,7 +117,7 @@ function findMostCommonColor(samples: Array<Color>): Color {
   for (const sample of samples) {
     // Group similar colors together (within tolerance of 10)
     let found = false
-    for (const [key, entry] of colorCounts) {
+    for (const [, entry] of colorCounts) {
       if (colorDistance(sample, entry.color) < 10) {
         entry.count++
         found = true

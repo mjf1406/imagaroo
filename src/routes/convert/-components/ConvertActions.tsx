@@ -31,7 +31,7 @@ export function ConvertActions({
         const blob = await convertImage(image.file, targetFormat)
         const newFilename = changeFileExtension(
           image.file.name,
-          targetFormat === 'jpeg' ? 'jpg' : targetFormat
+          targetFormat === 'jpeg' ? 'jpg' : targetFormat,
         )
         convertedFiles.push({ name: newFilename, blob })
       }
@@ -70,7 +70,8 @@ export function ConvertActions({
         ) : (
           <>
             <Download className="mr-2 size-4" />
-            Convert & Download {images.length > 1 ? `(${images.length} files)` : ''}
+            Convert & Download{' '}
+            {images.length > 1 ? `(${images.length} files)` : ''}
           </>
         )}
       </Button>
@@ -80,7 +81,7 @@ export function ConvertActions({
         size="lg"
         disabled={isConverting || images.length === 0}
       >
-        Clear All
+        Clear
       </Button>
     </div>
   )

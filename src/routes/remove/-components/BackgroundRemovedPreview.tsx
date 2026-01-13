@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
+import { useDebouncer } from '@tanstack/react-pacer'
+import type { ImageFile } from '@/components/ImagePreview'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { removeBg } from '@/lib/image-remove-bg'
-import type { ImageFile } from '@/components/ImagePreview'
 
 interface BackgroundRemovedPreviewProps {
   image: ImageFile | null
@@ -17,20 +18,25 @@ export function BackgroundRemovedPreview({
 }: BackgroundRemovedPreviewProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const cancelledRef = useRef<{ cancelled: boolean } | null>(null)
 
-  useEffect(() => {
-    if (!image) {
-      setPreviewUrl(null)
-      return
-    }
-
-    let cancelled = false
-
-    const generatePreview = async () => {
+  const debouncer = useDebouncer(
+    async (params: {
+      image: ImageFile
+      outputFormat: 'png' | 'webp'
+      tolerance: number
+    }) => {
+      const currentOperation = { cancelled: false }
+      cancelledRef.current = currentOperation
       setIsLoading(true)
+
       try {
-        const blob = await removeBg(image.file, outputFormat, tolerance)
-        if (!cancelled) {
+        const blob = await removeBg(
+          params.image.file,
+          params.outputFormat,
+          params.tolerance,
+        )
+        if (!currentOperation.cancelled) {
           const url = URL.createObjectURL(blob)
           // Clean up previous preview URL before setting new one
           setPreviewUrl((prev) => {
@@ -43,18 +49,32 @@ export function BackgroundRemovedPreview({
         }
       } catch (error) {
         console.error('Preview generation error:', error)
-        if (!cancelled) {
+        if (!currentOperation.cancelled) {
           setIsLoading(false)
         }
       }
+    },
+    { wait: 300 },
+  )
+
+  useEffect(() => {
+    if (!image) {
+      setPreviewUrl(null)
+      setIsLoading(false)
+      debouncer.cancel() // Cancel any pending debounced execution
+      if (cancelledRef.current) {
+        cancelledRef.current.cancelled = true
+      }
+      return
     }
 
-    generatePreview()
-
-    return () => {
-      cancelled = true
+    // Cancel previous operation and any pending debounced execution
+    debouncer.cancel()
+    if (cancelledRef.current) {
+      cancelledRef.current.cancelled = true
     }
-  }, [image, outputFormat, tolerance])
+    debouncer.maybeExecute({ image, outputFormat, tolerance })
+  }, [image, outputFormat, tolerance, debouncer])
 
   // Cleanup on unmount or when previewUrl changes
   useEffect(() => {
@@ -64,6 +84,16 @@ export function BackgroundRemovedPreview({
       }
     }
   }, [previewUrl])
+
+  // Cleanup debouncer on unmount
+  useEffect(() => {
+    return () => {
+      debouncer.cancel()
+      if (cancelledRef.current) {
+        cancelledRef.current.cancelled = true
+      }
+    }
+  }, [debouncer])
 
   if (!image) {
     return null

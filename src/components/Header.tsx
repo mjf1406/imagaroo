@@ -58,7 +58,7 @@ export default function Header() {
           </Link>
 
           <Link
-            to="/convert-image"
+            to="/convert"
             onClick={() => setIsOpen(false)}
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
             activeProps={{
@@ -71,7 +71,7 @@ export default function Header() {
           </Link>
 
           <Link
-            to="/crop-image"
+            to="/crop"
             onClick={() => setIsOpen(false)}
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
             activeProps={{

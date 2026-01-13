@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TransformIndexRouteImport } from './routes/transform/index'
 import { Route as RemoveIndexRouteImport } from './routes/remove/index'
 import { Route as CropIndexRouteImport } from './routes/crop/index'
 import { Route as ConvertIndexRouteImport } from './routes/convert/index'
@@ -17,6 +18,11 @@ import { Route as ConvertIndexRouteImport } from './routes/convert/index'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransformIndexRoute = TransformIndexRouteImport.update({
+  id: '/transform/',
+  path: '/transform/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RemoveIndexRoute = RemoveIndexRouteImport.update({
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/convert': typeof ConvertIndexRoute
   '/crop': typeof CropIndexRoute
   '/remove': typeof RemoveIndexRoute
+  '/transform': typeof TransformIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convert': typeof ConvertIndexRoute
   '/crop': typeof CropIndexRoute
   '/remove': typeof RemoveIndexRoute
+  '/transform': typeof TransformIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/convert/': typeof ConvertIndexRoute
   '/crop/': typeof CropIndexRoute
   '/remove/': typeof RemoveIndexRoute
+  '/transform/': typeof TransformIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/convert' | '/crop' | '/remove'
+  fullPaths: '/' | '/convert' | '/crop' | '/remove' | '/transform'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/convert' | '/crop' | '/remove'
-  id: '__root__' | '/' | '/convert/' | '/crop/' | '/remove/'
+  to: '/' | '/convert' | '/crop' | '/remove' | '/transform'
+  id: '__root__' | '/' | '/convert/' | '/crop/' | '/remove/' | '/transform/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +76,7 @@ export interface RootRouteChildren {
   ConvertIndexRoute: typeof ConvertIndexRoute
   CropIndexRoute: typeof CropIndexRoute
   RemoveIndexRoute: typeof RemoveIndexRoute
+  TransformIndexRoute: typeof TransformIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transform/': {
+      id: '/transform/'
+      path: '/transform'
+      fullPath: '/transform'
+      preLoaderRoute: typeof TransformIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/remove/': {
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConvertIndexRoute: ConvertIndexRoute,
   CropIndexRoute: CropIndexRoute,
   RemoveIndexRoute: RemoveIndexRoute,
+  TransformIndexRoute: TransformIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

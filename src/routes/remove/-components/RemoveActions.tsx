@@ -80,7 +80,7 @@ export function RemoveActions({
         size="lg"
         disabled={isRemoving || images.length === 0}
       >
-        Clear All
+        Clear
       </Button>
     </div>
   )

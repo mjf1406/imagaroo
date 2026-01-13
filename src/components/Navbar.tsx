@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Crop, Eraser, ImageIcon } from 'lucide-react'
+import { ImageIcon, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeSwitch } from '@/components/themes/theme-switch'
 
@@ -46,7 +46,7 @@ export default function Navbar() {
         </Link>
 
         <Link
-          to="/crop"
+          to="/transform"
           className={cn(
             'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
             'hover:bg-muted hover:text-foreground',
@@ -60,29 +60,9 @@ export default function Navbar() {
             ),
           }}
         >
-          <Crop className="size-4" />
-          <span className="hidden sm:inline">Crop</span>
-          <span className="sm:hidden">Crop</span>
-        </Link>
-
-        <Link
-          to="/remove"
-          className={cn(
-            'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
-            'hover:bg-muted hover:text-foreground',
-            'text-muted-foreground',
-          )}
-          activeProps={{
-            className: cn(
-              'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
-              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
-              'text-foreground',
-            ),
-          }}
-        >
-          <Eraser className="size-4" />
-          <span className="hidden sm:inline">Remove BG</span>
-          <span className="sm:hidden">Remove</span>
+          <Sparkles className="size-4" />
+          <span className="hidden sm:inline">Transform</span>
+          <span className="sm:hidden">Transform</span>
         </Link>
       </div>
 

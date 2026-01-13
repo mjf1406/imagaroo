@@ -1,4 +1,6 @@
+import { RotateCcw } from 'lucide-react'
 import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 interface ToleranceSliderProps {
@@ -16,11 +18,27 @@ export function ToleranceSlider({
   max = 100,
   step = 1,
 }: ToleranceSliderProps) {
+  const handleReset = () => {
+    onChange(30)
+  }
+
   return (
     <div className="mb-6 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium">Tolerance:</Label>
-        <span className="text-sm text-muted-foreground font-mono">{value}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground font-mono">{value}</span>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={handleReset}
+            aria-label="Reset tolerance to 30"
+            className="h-6 w-6"
+          >
+            <RotateCcw className="size-3" />
+          </Button>
+        </div>
       </div>
       <input
         type="range"

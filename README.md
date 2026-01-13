@@ -15,6 +15,8 @@
 
 ### 2026/01/13
 
+- BE: added debouncer to remove bg preview
+- UX: combined crop and remove bg pages into one new page, Transform
 - FT: added remove bg feature
 - UX: added theme switcher
 - UI: added navbar

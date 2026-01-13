@@ -2,23 +2,26 @@ import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { FileUploadArea } from '../convert/-components/FileUploadArea'
 import { ImagePreviewGrid } from '../convert/-components/ImagePreviewGrid'
-import { RemoveImagePageHeader } from './-components/RemoveImagePageHeader'
-import { RemoveActions } from './-components/RemoveActions'
-import { OutputFormatSelector } from './-components/OutputFormatSelector'
-import { ToleranceSlider } from './-components/ToleranceSlider'
-import { BackgroundRemovedPreview } from './-components/BackgroundRemovedPreview'
+import { OutputFormatSelector } from '../crop/-components/OutputFormatSelector'
+import { ToleranceSlider } from '../remove/-components/ToleranceSlider'
+import { BackgroundRemovedPreview } from '../remove/-components/BackgroundRemovedPreview'
+import { TransformPageHeader } from './-components/TransformPageHeader'
+import { ModeToggle } from './-components/ModeToggle'
+import { TransformActions } from './-components/TransformActions'
 import type { ImageFile } from '@/components/ImagePreview'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg', 'avif', 'ico']
 
-export const Route = createFileRoute('/remove/')({
-  component: RemoveImagePage,
+export const Route = createFileRoute('/transform/')({
+  component: TransformImagePage,
 })
 
-function RemoveImagePage() {
+function TransformImagePage() {
   const [images, setImages] = useState<Array<ImageFile>>([])
   const [outputFormat, setOutputFormat] = useState<'png' | 'webp'>('webp')
   const [tolerance, setTolerance] = useState(30)
+  const [crop, setCrop] = useState(true)
+  const [remove, setRemove] = useState(true)
 
   const handleFilesAdded = (newImages: Array<ImageFile>) => {
     setImages((prev) => [...prev, ...newImages])
@@ -35,7 +38,7 @@ function RemoveImagePage() {
   }
 
   const handleFormatChange = (_id: string, _format: string | null) => {
-    // Not used in remove page, but required by ImagePreviewGrid interface
+    // Not used in transform page, but required by ImagePreviewGrid interface
     // We keep it for compatibility but it won't affect the output
   }
 
@@ -48,15 +51,15 @@ function RemoveImagePage() {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
-      <RemoveImagePageHeader />
+      <TransformPageHeader />
       {/* Flex row layout on md+ screens */}
       <div className="flex flex-col md:flex-row gap-6">
         {/* Left side: File upload area */}
         <div className="flex-1">
           <FileUploadArea onFilesAdded={handleFilesAdded} />
         </div>
-        {/* Middle: Preview section - shows first image with background removed */}
-        {images.length > 0 && (
+        {/* Middle: Preview section - only for remove mode */}
+        {remove && images.length > 0 && (
           <div className="md:w-80 md:shrink-0">
             <BackgroundRemovedPreview
               image={images[0]}
@@ -68,21 +71,31 @@ function RemoveImagePage() {
         {/* Right side: Controls (always visible) */}
         <div className="md:w-80 md:shrink-0">
           <div className="space-y-4">
+            <ModeToggle
+              crop={crop}
+              remove={remove}
+              onCropChange={setCrop}
+              onRemoveChange={setRemove}
+            />
             <OutputFormatSelector
               value={outputFormat}
               onChange={setOutputFormat}
             />
-            <ToleranceSlider
-              value={tolerance}
-              onChange={setTolerance}
-              min={0}
-              max={100}
-              step={1}
-            />
-            <RemoveActions
+            {remove && (
+              <ToleranceSlider
+                value={tolerance}
+                onChange={setTolerance}
+                min={0}
+                max={100}
+                step={1}
+              />
+            )}
+            <TransformActions
               images={images}
               outputFormat={outputFormat}
               tolerance={tolerance}
+              crop={crop}
+              remove={remove}
               onClear={handleClear}
             />
           </div>

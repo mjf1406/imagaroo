@@ -67,7 +67,8 @@ export function CropActions({
         ) : (
           <>
             <Download className="mr-2 size-4" />
-            Crop & Download {images.length > 1 ? `(${images.length} files)` : ''}
+            Crop & Download{' '}
+            {images.length > 1 ? `(${images.length} files)` : ''}
           </>
         )}
       </Button>
@@ -77,7 +78,7 @@ export function CropActions({
         size="lg"
         disabled={isCropping || images.length === 0}
       >
-        Clear All
+        Clear
       </Button>
     </div>
   )

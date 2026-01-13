@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { Crop, Eraser, ImageIcon } from 'lucide-react'
+import { ImageIcon, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -20,7 +20,7 @@ function HomePage() {
       <div className="text-center mb-12 mt-8">
         <h1 className="text-4xl font-bold mb-4">Image Tools</h1>
         <p className="text-muted-foreground text-lg">
-          Convert, crop, and remove backgrounds from your images with ease
+          Convert and transform your images with ease
         </p>
       </div>
 
@@ -50,40 +50,19 @@ function HomePage() {
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="rounded-lg bg-primary/10 p-2">
-                <Crop className="size-6 text-primary" />
+                <Sparkles className="size-6 text-primary" />
               </div>
-              <CardTitle className="text-2xl">Crop Images</CardTitle>
+              <CardTitle className="text-2xl">Transform Images</CardTitle>
             </div>
             <CardDescription>
-              Automatically crop images by detecting content boundaries.
+              Crop images or remove backgrounds. Switch between modes with a
+              single toggle.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/crop">
+            <Link to="/transform">
               <Button className="w-full" size="lg">
-                Open Cropper
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="rounded-lg bg-primary/10 p-2">
-                <Eraser className="size-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Remove Background</CardTitle>
-            </div>
-            <CardDescription>
-              Automatically remove backgrounds from images by detecting the
-              background color and replacing it with transparency.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Link to="/remove">
-              <Button className="w-full" size="lg">
-                Remove Background
+                Open Transformer
               </Button>
             </Link>
           </CardContent>
