@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
+import type { ImageFile } from '@/components/ImagePreview'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
-import { cn } from '@/lib/utils'
-import type { ImageFile } from '@/components/ImagePreview'
 
 interface ReduceControlsProps {
   images: Array<ImageFile>

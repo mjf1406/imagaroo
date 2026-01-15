@@ -1,5 +1,11 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { ImageIcon, Sparkles } from 'lucide-react'
+import {
+  ImageIcon,
+  Sparkles,
+  Scissors,
+  Eraser,
+  Minimize2,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -16,7 +22,7 @@ export const Route = createFileRoute('/')({
 
 function HomePage() {
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
+    <div className="container mx-auto p-4 max-w-6xl">
       <div className="text-center mb-12 mt-8">
         <h1 className="text-4xl font-bold mb-4">Image Tools</h1>
         <p className="text-muted-foreground text-lg">
@@ -51,13 +57,79 @@ function HomePage() {
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <div className="rounded-lg bg-primary/10 p-2">
+                <Scissors className="size-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Crop</CardTitle>
+            </div>
+            <CardDescription>
+              Automatically crop images by detecting content boundaries.
+              Remove unnecessary whitespace from your images.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/crop">
+              <Button className="w-full" size="lg">
+                Open Cropper
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <Eraser className="size-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Remove Background</CardTitle>
+            </div>
+            <CardDescription>
+              Automatically remove backgrounds from images. Works best with
+              images that have a single solid background.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/remove">
+              <Button className="w-full" size="lg">
+                Open Remover
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <Minimize2 className="size-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Reduce</CardTitle>
+            </div>
+            <CardDescription>
+              Resize images to reduce file size and resolution. Adjust
+              dimensions while maintaining aspect ratio.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/reduce">
+              <Button className="w-full" size="lg">
+                Open Reducer
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-lg bg-primary/10 p-2">
                 <Sparkles className="size-6 text-primary" />
               </div>
               <CardTitle className="text-2xl">Transform</CardTitle>
             </div>
             <CardDescription>
-              Crop images or remove backgrounds. Switch between modes with a
-              single toggle.
+              Crop, remove backgrounds, and reduce images all at once. Switch
+              between modes with a single toggle.
             </CardDescription>
           </CardHeader>
           <CardContent>

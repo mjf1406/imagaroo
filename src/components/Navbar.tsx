@@ -1,5 +1,11 @@
 import { Link } from '@tanstack/react-router'
-import { ImageIcon, Sparkles } from 'lucide-react'
+import {
+  ImageIcon,
+  Sparkles,
+  Scissors,
+  Eraser,
+  Minimize2,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeSwitch } from '@/components/themes/theme-switch'
 
@@ -24,45 +30,100 @@ export default function Navbar() {
       </Link>
 
       {/* Tools - Middle */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 overflow-x-auto">
         <Link
           to="/convert"
           className={cn(
-            'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
             'hover:bg-muted hover:text-foreground',
             'text-muted-foreground',
           )}
           activeProps={{
             className: cn(
-              'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
               'border-b-4 border-primary hover:bg-muted hover:text-foreground',
               'text-foreground',
             ),
           }}
         >
           <ImageIcon className="size-4" />
-          <span className="hidden md:inline">Convert</span>
-          <span className="sr-only md:hidden">Convert</span>
+          <span className="hidden lg:inline">Convert</span>
         </Link>
 
         <Link
-          to="/transform"
+          to="/crop"
           className={cn(
-            'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
             'hover:bg-muted hover:text-foreground',
             'text-muted-foreground',
           )}
           activeProps={{
             className: cn(
-              'flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors',
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
+              'text-foreground',
+            ),
+          }}
+        >
+          <Scissors className="size-4" />
+          <span className="hidden lg:inline">Crop</span>
+        </Link>
+
+        <Link
+          to="/remove"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+            'hover:bg-muted hover:text-foreground',
+            'text-muted-foreground',
+          )}
+          activeProps={{
+            className: cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
+              'text-foreground',
+            ),
+          }}
+        >
+          <Eraser className="size-4" />
+          <span className="hidden lg:inline">Remove BG</span>
+        </Link>
+
+        <Link
+          to="/reduce"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+            'hover:bg-muted hover:text-foreground',
+            'text-muted-foreground',
+          )}
+          activeProps={{
+            className: cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
+              'text-foreground',
+            ),
+          }}
+        >
+          <Minimize2 className="size-4" />
+          <span className="hidden lg:inline">Reduce</span>
+        </Link>
+
+        <Link
+          to="/transform"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+            'hover:bg-muted hover:text-foreground',
+            'text-muted-foreground',
+          )}
+          activeProps={{
+            className: cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
               'border-b-4 border-primary hover:bg-muted hover:text-foreground',
               'text-foreground',
             ),
           }}
         >
           <Sparkles className="size-4" />
-          <span className="hidden md:inline">Transform</span>
-          <span className="sr-only md:hidden">Transform</span>
+          <span className="hidden lg:inline">Transform</span>
         </Link>
       </div>
 
