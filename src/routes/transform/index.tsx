@@ -8,6 +8,7 @@ import { BackgroundRemovedPreview } from '../remove/-components/BackgroundRemove
 import { TransformPageHeader } from './-components/TransformPageHeader'
 import { ModeToggle } from './-components/ModeToggle'
 import { TransformActions } from './-components/TransformActions'
+import { ReduceControls } from './-components/ReduceControls'
 import type { ImageFile } from '@/components/ImagePreview'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg', 'avif', 'ico']
@@ -22,6 +23,10 @@ function TransformImagePage() {
   const [tolerance, setTolerance] = useState(30)
   const [crop, setCrop] = useState(true)
   const [remove, setRemove] = useState(true)
+  const [reduce, setReduce] = useState(false)
+  const [reduceWidth, setReduceWidth] = useState<number | null>(null)
+  const [reduceHeight, setReduceHeight] = useState<number | null>(null)
+  const [dimensionsLinked, setDimensionsLinked] = useState(true)
 
   const handleFilesAdded = (newImages: Array<ImageFile>) => {
     setImages((prev) => [...prev, ...newImages])
@@ -58,8 +63,8 @@ function TransformImagePage() {
         <div className="flex-1">
           <FileUploadArea onFilesAdded={handleFilesAdded} />
         </div>
-        {/* Middle: Preview section - show if crop or remove is selected */}
-        {(crop || remove) && images.length > 0 && (
+        {/* Middle: Preview section - show if crop, remove, or reduce is selected */}
+        {(crop || remove || reduce) && images.length > 0 && (
           <div className="md:w-80 md:shrink-0">
             <BackgroundRemovedPreview
               image={images[0]}
@@ -76,8 +81,10 @@ function TransformImagePage() {
             <ModeToggle
               crop={crop}
               remove={remove}
+              reduce={reduce}
               onCropChange={setCrop}
               onRemoveChange={setRemove}
+              onReduceChange={setReduce}
             />
             <OutputFormatSelector
               value={outputFormat}
@@ -92,12 +99,26 @@ function TransformImagePage() {
                 step={1}
               />
             )}
+            {reduce && (
+              <ReduceControls
+                images={images}
+                width={reduceWidth}
+                height={reduceHeight}
+                dimensionsLinked={dimensionsLinked}
+                onWidthChange={setReduceWidth}
+                onHeightChange={setReduceHeight}
+                onDimensionsLinkedChange={setDimensionsLinked}
+              />
+            )}
             <TransformActions
               images={images}
               outputFormat={outputFormat}
               tolerance={tolerance}
               crop={crop}
               remove={remove}
+              reduce={reduce}
+              reduceWidth={reduceWidth}
+              reduceHeight={reduceHeight}
               onClear={handleClear}
             />
           </div>
