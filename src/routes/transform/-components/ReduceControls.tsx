@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { RotateCcw } from 'lucide-react'
+
 import type { ImageFile } from '@/components/ImagePreview'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
+import { SteppedNumberInput } from '@/components/SteppedNumberInput'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 
 interface ReduceControlsProps {
@@ -29,31 +31,33 @@ export function ReduceControls({
     height: number
   } | null>(null)
 
-  // Load dimensions from first image
+  const widthRef = useRef(width)
+  const heightRef = useRef(height)
+  widthRef.current = width
+  heightRef.current = height
+
+  // Load dimensions from first image (runs when `images` changes only)
   useEffect(() => {
-    if (images.length > 0) {
-      const img = new Image()
-      let isMounted = true
-      img.onload = () => {
-        if (!isMounted) return
-        const newDimensions = { width: img.width, height: img.height }
-        setOriginalDimensions(newDimensions)
-        // Initialize dimensions if not set (only when images change)
-        if (width === null && height === null) {
-          onWidthChange(newDimensions.width)
-          onHeightChange(newDimensions.height)
-        }
-      }
-      img.src = images[0].preview
-      return () => {
-        isMounted = false
-      }
-    } else {
+    if (images.length === 0) {
       setOriginalDimensions(null)
+      return
     }
-    // Only depend on images array, check width/height from closure
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [images])
+    const img = new Image()
+    let isMounted = true
+    img.onload = () => {
+      if (!isMounted) return
+      const newDimensions = { width: img.width, height: img.height }
+      setOriginalDimensions(newDimensions)
+      if (widthRef.current === null && heightRef.current === null) {
+        onWidthChange(newDimensions.width)
+        onHeightChange(newDimensions.height)
+      }
+    }
+    img.src = images[0].preview
+    return () => {
+      isMounted = false
+    }
+  }, [images, onHeightChange, onWidthChange])
 
   const handlePreset = (percentage: number) => {
     if (!originalDimensions) return
@@ -91,9 +95,32 @@ export function ReduceControls({
     }
   }
 
+  const handleResetDimensions = () => {
+    if (!originalDimensions) return
+    onWidthChange(originalDimensions.width)
+    onHeightChange(originalDimensions.height)
+  }
+
+  const showSteppers =
+    originalDimensions !== null && width !== null && height !== null
+
   return (
     <div className="mb-6 flex flex-col gap-3">
-      <Label className="text-sm font-medium">Resolution:</Label>
+      <div className="flex items-center justify-between gap-2">
+        <Label className="text-sm font-medium">Resolution:</Label>
+        {originalDimensions && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="h-6 w-6 shrink-0"
+            onClick={handleResetDimensions}
+            aria-label="Reset width and height to original image dimensions"
+          >
+            <RotateCcw className="size-3" aria-hidden />
+          </Button>
+        )}
+      </div>
 
       {/* Preset buttons */}
       <div className="flex gap-2">
@@ -128,35 +155,49 @@ export function ReduceControls({
 
       {/* Custom dimensions */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Label htmlFor="reduce-width" className="text-xs w-12">
+        <div className="flex flex-wrap items-center gap-2">
+          <Label htmlFor="reduce-width" className="text-xs w-12 shrink-0">
             Width:
           </Label>
-          <Input
-            id="reduce-width"
-            type="number"
-            min="1"
-            value={width ?? ''}
-            onChange={(e) => handleWidthChange(e.target.value)}
-            placeholder="Width"
-            className="flex-1"
-          />
-          <span className="text-xs text-muted-foreground">px</span>
+          {showSteppers ? (
+            <>
+              <SteppedNumberInput
+                id="reduce-width"
+                value={width}
+                onChange={(n) => handleWidthChange(String(n))}
+                min={1}
+                max={50000}
+                step={1}
+                aria-label="Output width in pixels"
+                className="min-w-0 max-w-[14rem] flex-1"
+              />
+              <span className="text-xs text-muted-foreground">px</span>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground">Loading…</span>
+          )}
         </div>
-        <div className="flex items-center gap-2">
-          <Label htmlFor="reduce-height" className="text-xs w-12">
+        <div className="flex flex-wrap items-center gap-2">
+          <Label htmlFor="reduce-height" className="text-xs w-12 shrink-0">
             Height:
           </Label>
-          <Input
-            id="reduce-height"
-            type="number"
-            min="1"
-            value={height ?? ''}
-            onChange={(e) => handleHeightChange(e.target.value)}
-            placeholder="Height"
-            className="flex-1"
-          />
-          <span className="text-xs text-muted-foreground">px</span>
+          {showSteppers ? (
+            <>
+              <SteppedNumberInput
+                id="reduce-height"
+                value={height}
+                onChange={(n) => handleHeightChange(String(n))}
+                min={1}
+                max={50000}
+                step={1}
+                aria-label="Output height in pixels"
+                className="min-w-0 max-w-[14rem] flex-1"
+              />
+              <span className="text-xs text-muted-foreground">px</span>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground">Loading…</span>
+          )}
         </div>
       </div>
 

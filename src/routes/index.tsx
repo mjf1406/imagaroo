@@ -1,10 +1,11 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import {
-  ImageIcon,
-  Sparkles,
-  Scissors,
   Eraser,
+  ImageIcon,
+  Lightbulb,
   Minimize2,
+  Scissors,
+  Sparkles,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -114,6 +115,28 @@ function HomePage() {
             <Link to="/reduce">
               <Button className="w-full" size="lg">
                 Open Reducer
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <Lightbulb className="size-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Spotlight</CardTitle>
+            </div>
+            <CardDescription>
+              Draw rectangles or ellipses to keep part of your image sharp while
+              you darken or blur the rest.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/spotlight">
+              <Button className="w-full" size="lg">
+                Open Spotlight
               </Button>
             </Link>
           </CardContent>

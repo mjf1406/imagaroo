@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import {
-  ImageIcon,
-  Sparkles,
-  Scissors,
   Eraser,
+  ImageIcon,
+  Lightbulb,
   Minimize2,
+  Scissors,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeSwitch } from '@/components/themes/theme-switch'
@@ -105,6 +106,25 @@ export default function Navbar() {
         >
           <Minimize2 className="size-4" />
           <span className="hidden lg:inline">Reduce</span>
+        </Link>
+
+        <Link
+          to="/spotlight"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+            'hover:bg-muted hover:text-foreground',
+            'text-muted-foreground',
+          )}
+          activeProps={{
+            className: cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
+              'text-foreground',
+            ),
+          }}
+        >
+          <Lightbulb className="size-4" />
+          <span className="hidden lg:inline">Spotlight</span>
         </Link>
 
         <Link

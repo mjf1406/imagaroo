@@ -11,6 +11,21 @@ import { getFileExtension, hasTransparency } from '@/lib/image-converter'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg']
 
+/** Default output format for common uploads (webp→jpg, png/jpg→webp). */
+function outputFormatForUpload(file: File): string | null {
+  const ext = getFileExtension(file.name).toLowerCase()
+  if (ext === 'webp') return 'jpg'
+  if (ext === 'png') return 'webp'
+  if (ext === 'jpg' || ext === 'jpeg') return 'webp'
+
+  const type = file.type.toLowerCase()
+  if (type === 'image/webp') return 'jpg'
+  if (type === 'image/png') return 'webp'
+  if (type === 'image/jpeg' || type === 'image/jpg') return 'webp'
+
+  return null
+}
+
 export const Route = createFileRoute('/convert/')({
   component: ConvertImagePage,
 })
@@ -25,6 +40,11 @@ function ConvertImagePage() {
 
   const handleFilesAdded = async (newImages: Array<ImageFile>) => {
     setImages((prev) => [...prev, ...newImages])
+
+    const suggested = outputFormatForUpload(newImages[0].file)
+    if (suggested) {
+      setGlobalFormat(suggested)
+    }
 
     // Check for transparency in new images
     const transparencySet = new Set(imagesWithTransparency)

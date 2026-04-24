@@ -13,6 +13,11 @@
 - BE: backend
 - BUG: bug
 
+### 2026/04/24
+
+- FT: added Spotlight tool to draw rectangles/ellipses, darken or blur outside
+  (or inside) the shapes, and export JPG/PNG/WEBP
+
 ### 2026/01/13
 
 - UX: user can now select the background color when converting to JPG
