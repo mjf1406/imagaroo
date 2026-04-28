@@ -11,22 +11,6 @@ export type MagnifierFrame = {
   connector: { enabled: boolean; color: string; widthPx: number }
 }
 
-export type MagnifierRenderOptions = {
-  frame: MagnifierFrame | null
-  imageWidth: number
-  imageHeight: number
-  canvasWidth: number
-  canvasHeight: number
-  /** Where the image's (0,0) lands on the canvas. */
-  offsetX: number
-  offsetY: number
-  /**
-   * If false, skips clearRect so callers can pre-fill the canvas (e.g. JPG background).
-   * @default true
-   */
-  clearBeforeDraw?: boolean
-}
-
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n))
 }
@@ -161,120 +145,28 @@ function letterboxDraw(
   ctx.restore()
 }
 
-export function renderMagnifier(
+/**
+ * Draws magnifier outlines, connectors, inset background, and letterboxed zoom
+ * on top of an image already drawn at `(offsetX, offsetY)`.
+ * `frame` coordinates are in image space.
+ */
+export function drawMagnifierOverlay(
   ctx: CanvasRenderingContext2D,
   img: CanvasImageSource,
-  options: MagnifierRenderOptions,
+  frame: MagnifierFrame,
+  offsetX: number,
+  offsetY: number,
 ): void {
-  const {
-    frame,
-    imageWidth,
-    imageHeight,
-    canvasWidth,
-    canvasHeight,
-    offsetX,
-    offsetY,
-    clearBeforeDraw = true,
-  } = options
-
-  if (clearBeforeDraw) {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-  }
-  ctx.drawImage(img, offsetX, offsetY, imageWidth, imageHeight)
-
-  if (!frame) return
-
   ctx.save()
   ctx.translate(offsetX, offsetY)
-
-  // Source outline + connectors beneath inset box to match inset-map feel.
   strokeRect(ctx, frame.source, frame.sourceOutline)
   drawConnectors(ctx, frame)
-
-  // Inset: background fill (letterbox bars), clipped letterboxed content, then outline.
   ctx.save()
   ctx.fillStyle = frame.insetBackgroundColor
   ctx.fillRect(frame.inset.x, frame.inset.y, frame.inset.w, frame.inset.h)
   ctx.restore()
-
   letterboxDraw(ctx, img, frame.source, frame.inset)
   strokeRect(ctx, frame.inset, frame.insetOutline)
   ctx.restore()
-}
-
-export type MagnifierExportFormat = 'jpg' | 'png' | 'webp'
-
-export type ExportMagnifierOptions = {
-  frame: MagnifierFrame | null
-  format: MagnifierExportFormat
-  /** Used when format is jpg — fills canvas before drawing (transparency → solid) */
-  jpgBackgroundColor?: string
-  quality?: number
-}
-
-export function exportMagnifier(
-  img: HTMLImageElement,
-  options: ExportMagnifierOptions,
-): Promise<Blob> {
-  const w = img.naturalWidth
-  const h = img.naturalHeight
-  if (w === 0 || h === 0) {
-    return Promise.reject(new Error('Image has no dimensions'))
-  }
-
-  const canvas = document.createElement('canvas')
-  const ext = magnifierExtent(options.frame, w, h)
-  canvas.width = ext.canvasW
-  canvas.height = ext.canvasH
-  const ctx = canvas.getContext('2d')
-  if (!ctx) {
-    return Promise.reject(new Error('Failed to get canvas context'))
-  }
-
-  const { format, jpgBackgroundColor, quality = 0.92, frame } = options
-
-  if (format === 'jpg') {
-    const bg = jpgBackgroundColor ?? '#ffffff'
-    ctx.fillStyle = bg
-    ctx.fillRect(0, 0, ext.canvasW, ext.canvasH)
-    renderMagnifier(ctx, img, {
-      frame,
-      imageWidth: w,
-      imageHeight: h,
-      canvasWidth: ext.canvasW,
-      canvasHeight: ext.canvasH,
-      offsetX: ext.offsetX,
-      offsetY: ext.offsetY,
-      clearBeforeDraw: false,
-    })
-  } else {
-    renderMagnifier(ctx, img, {
-      frame,
-      imageWidth: w,
-      imageHeight: h,
-      canvasWidth: ext.canvasW,
-      canvasHeight: ext.canvasH,
-      offsetX: ext.offsetX,
-      offsetY: ext.offsetY,
-    })
-  }
-
-  const mime =
-    format === 'jpg'
-      ? 'image/jpeg'
-      : format === 'webp'
-        ? 'image/webp'
-        : 'image/png'
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (blob) resolve(blob)
-        else reject(new Error('Failed to encode image'))
-      },
-      mime,
-      format === 'png' ? undefined : quality,
-    )
-  })
 }
 

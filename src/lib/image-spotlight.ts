@@ -1,7 +1,11 @@
 /**
  * Spotlight / vignette-by-shapes: draw rectangles and ellipses in image space,
  * then either darken or blur everywhere except the chosen focus side of the union.
+ * Optional magnifier frame adds an inset zoom; its source rect joins the focus mask.
  */
+
+import type { MagnifierFrame, MagnifierRect } from './image-magnifier'
+import { drawMagnifierOverlay, magnifierExtent } from './image-magnifier'
 
 export type SpotlightShapeKind = 'rect' | 'ellipse'
 
@@ -93,6 +97,8 @@ export type SpotlightRenderOptions = {
   /** 0–50, CSS blur px (blur mode) */
   blurStrength: number
   focusArea: SpotlightFocusArea
+  /** Inset zoom frame; source rect is included in the spotlight mask. */
+  magnifier?: MagnifierFrame | null
   /**
    * If false, skips clearRect so callers can pre-fill the canvas (e.g. JPG background).
    * @default true
@@ -125,75 +131,106 @@ function fillShapePath(
  * Opaque white where the effect should be applied; transparent elsewhere.
  * - focus `inside`: sharp inside union → effect outside union
  * - focus `outside`: sharp outside union → effect inside union
+ * Shapes and magnifier source are in image space; mask is canvas-sized with `offsetX/Y`.
  */
 function buildEffectAlphaMask(
-  width: number,
-  height: number,
+  canvasW: number,
+  canvasH: number,
   shapes: Array<SpotlightShape>,
+  magnifierSource: MagnifierRect | null,
   focusArea: SpotlightFocusArea,
+  offsetX: number,
+  offsetY: number,
 ): HTMLCanvasElement {
   const mask = document.createElement('canvas')
-  mask.width = width
-  mask.height = height
+  mask.width = canvasW
+  mask.height = canvasH
   const m = mask.getContext('2d')
   if (!m) return mask
 
-  if (shapes.length === 0) {
-    // No shapes → no effect region (full sharp)
+  const hasMagSrc =
+    magnifierSource !== null &&
+    magnifierSource.w > 0 &&
+    magnifierSource.h > 0
+  if (shapes.length === 0 && !hasMagSrc) {
     return mask
   }
 
   if (focusArea === 'inside') {
-    // Effect outside union of shapes: opaque everywhere, punch out union
     m.fillStyle = '#ffffff'
-    m.fillRect(0, 0, width, height)
+    m.fillRect(0, 0, canvasW, canvasH)
     m.globalCompositeOperation = 'destination-out'
     m.fillStyle = '#ffffff'
+    m.save()
+    m.translate(offsetX, offsetY)
     for (const s of shapes) {
       m.beginPath()
       fillShapePath(m, s)
       m.fill()
     }
+    if (hasMagSrc && magnifierSource) {
+      m.fillRect(
+        magnifierSource.x,
+        magnifierSource.y,
+        magnifierSource.w,
+        magnifierSource.h,
+      )
+    }
+    m.restore()
     m.globalCompositeOperation = 'source-over'
   } else {
-    // Effect inside union of shapes
-    m.clearRect(0, 0, width, height)
+    m.clearRect(0, 0, canvasW, canvasH)
     m.fillStyle = '#ffffff'
+    m.save()
+    m.translate(offsetX, offsetY)
     for (const s of shapes) {
       m.beginPath()
       fillShapePath(m, s)
       m.fill()
     }
+    if (hasMagSrc && magnifierSource) {
+      m.fillRect(
+        magnifierSource.x,
+        magnifierSource.y,
+        magnifierSource.w,
+        magnifierSource.h,
+      )
+    }
+    m.restore()
   }
 
   return mask
 }
 
-function drawTreatedLayer(
-  width: number,
-  height: number,
+function drawTreatedLayerExtended(
+  canvasW: number,
+  canvasH: number,
   img: CanvasImageSource,
+  offsetX: number,
+  offsetY: number,
+  iw: number,
+  ih: number,
   effect: SpotlightEffect,
   darkenStrength: number,
   blurStrength: number,
 ): HTMLCanvasElement {
   const c = document.createElement('canvas')
-  c.width = width
-  c.height = height
+  c.width = canvasW
+  c.height = canvasH
   const ctx = c.getContext('2d')
   if (!ctx) return c
 
   if (effect === 'darken') {
-    ctx.drawImage(img, 0, 0, width, height)
+    ctx.drawImage(img, offsetX, offsetY, iw, ih)
     const a = clamp(darkenStrength, 0, 100) / 100
     if (a > 0) {
       ctx.fillStyle = `rgba(0,0,0,${a})`
-      ctx.fillRect(0, 0, width, height)
+      ctx.fillRect(offsetX, offsetY, iw, ih)
     }
   } else {
     const px = clamp(blurStrength, 0, 50)
     ctx.filter = px > 0 ? `blur(${px}px)` : 'none'
-    ctx.drawImage(img, 0, 0, width, height)
+    ctx.drawImage(img, offsetX, offsetY, iw, ih)
     ctx.filter = 'none'
   }
 
@@ -203,8 +240,11 @@ function drawTreatedLayer(
 function fillShapeFills(
   ctx: CanvasRenderingContext2D,
   shapes: Array<SpotlightShape>,
+  offsetX: number,
+  offsetY: number,
 ): void {
   ctx.save()
+  ctx.translate(offsetX, offsetY)
   for (const s of shapes) {
     if (s.w <= 0 || s.h <= 0 || !s.fill) continue
     ctx.fillStyle = spotlightFillToRgbaString(s.fill)
@@ -218,8 +258,11 @@ function fillShapeFills(
 function strokeShapeOutlines(
   ctx: CanvasRenderingContext2D,
   shapes: Array<SpotlightShape>,
+  offsetX: number,
+  offsetY: number,
 ): void {
   ctx.save()
+  ctx.translate(offsetX, offsetY)
   ctx.lineJoin = 'round'
   ctx.lineCap = 'round'
   for (const s of shapes) {
@@ -234,8 +277,9 @@ function strokeShapeOutlines(
 }
 
 /**
- * Renders the spotlight result into `ctx`. The context's canvas must already
- * match `width` x `height` (same as the image's natural dimensions).
+ * Renders the spotlight result into `ctx`.
+ * `width`/`height` are the image's natural dimensions (image space).
+ * The canvas backing store must match `magnifierExtent(magnifier, width, height)`.
  */
 export function renderSpotlight(
   ctx: CanvasRenderingContext2D,
@@ -250,15 +294,24 @@ export function renderSpotlight(
     darkenStrength,
     blurStrength,
     focusArea,
+    magnifier = null,
     clearBeforeDraw = true,
   } = options
 
-  if (clearBeforeDraw) {
-    ctx.clearRect(0, 0, width, height)
-  }
-  ctx.drawImage(img, 0, 0, width, height)
+  const iw = width
+  const ih = height
+  const ext = magnifierExtent(magnifier, iw, ih)
+  const { canvasW, canvasH, offsetX, offsetY } = ext
 
-  if (shapes.length === 0) {
+  if (clearBeforeDraw) {
+    ctx.clearRect(0, 0, canvasW, canvasH)
+  }
+  ctx.drawImage(img, offsetX, offsetY, iw, ih)
+
+  const hasMag = magnifier !== null
+  const hasUnion = shapes.length > 0 || hasMag
+
+  if (!hasUnion) {
     return
   }
 
@@ -268,20 +321,32 @@ export function renderSpotlight(
       : clamp(blurStrength, 0, 50) > 0
 
   if (hasEffect) {
-    const treated = drawTreatedLayer(
-      width,
-      height,
+    const treated = drawTreatedLayerExtended(
+      canvasW,
+      canvasH,
       img,
+      offsetX,
+      offsetY,
+      iw,
+      ih,
       effect,
       darkenStrength,
       blurStrength,
     )
 
-    const mask = buildEffectAlphaMask(width, height, shapes, focusArea)
+    const mask = buildEffectAlphaMask(
+      canvasW,
+      canvasH,
+      shapes,
+      magnifier !== null ? magnifier.source : null,
+      focusArea,
+      offsetX,
+      offsetY,
+    )
 
     const masked = document.createElement('canvas')
-    masked.width = width
-    masked.height = height
+    masked.width = canvasW
+    masked.height = canvasH
     const mctx = masked.getContext('2d')
     if (!mctx) return
 
@@ -293,8 +358,12 @@ export function renderSpotlight(
     ctx.drawImage(masked, 0, 0)
   }
 
-  fillShapeFills(ctx, shapes)
-  strokeShapeOutlines(ctx, shapes)
+  if (hasMag && magnifier) {
+    drawMagnifierOverlay(ctx, img, magnifier, offsetX, offsetY)
+  }
+
+  fillShapeFills(ctx, shapes, offsetX, offsetY)
+  strokeShapeOutlines(ctx, shapes, offsetX, offsetY)
 }
 
 export type SpotlightExportFormat = 'jpg' | 'png' | 'webp'
@@ -319,9 +388,10 @@ export function exportSpotlight(
     return Promise.reject(new Error('Image has no dimensions'))
   }
 
+  const ext = magnifierExtent(options.magnifier ?? null, w, h)
   const canvas = document.createElement('canvas')
-  canvas.width = w
-  canvas.height = h
+  canvas.width = ext.canvasW
+  canvas.height = ext.canvasH
   const ctx = canvas.getContext('2d')
   if (!ctx) {
     return Promise.reject(new Error('Failed to get canvas context'))
@@ -332,7 +402,7 @@ export function exportSpotlight(
   if (format === 'jpg') {
     const bg = jpgBackgroundColor ?? '#ffffff'
     ctx.fillStyle = bg
-    ctx.fillRect(0, 0, w, h)
+    ctx.fillRect(0, 0, ext.canvasW, ext.canvasH)
     renderSpotlight(ctx, img, w, h, { ...rest, clearBeforeDraw: false })
   } else {
     renderSpotlight(ctx, img, w, h, rest)

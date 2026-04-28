@@ -21,6 +21,7 @@
 ### 2026/04/28
 
 - FT: added Magnifier tool to create inset zoom frames with connector lines and export JPG/PNG/WEBP
+- FT: merged Magnifier into Spotlight (magnifier source joins darken/blur mask); `/magnifier` redirects to `/spotlight`
 
 ### 2026/01/13
 

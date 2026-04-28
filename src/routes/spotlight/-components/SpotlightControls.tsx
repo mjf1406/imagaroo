@@ -1,4 +1,4 @@
-import { Circle, RotateCcw, Square } from 'lucide-react'
+import { Circle, PictureInPicture, RotateCcw, Square } from 'lucide-react'
 import { OutlineColorSwatchPopover } from './OutlineColorSwatchPopover'
 import type { ReactNode } from 'react'
 import type { SpotlightTool } from './SpotlightCanvas'
@@ -20,7 +20,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { BackgroundColorPicker } from '@/routes/convert/-components/BackgroundColorPicker'
-
+import type { MagnifierFrame } from '@/lib/image-magnifier'
 
 export type SpotlightOutputFormat = 'jpg' | 'png' | 'webp'
 
@@ -41,6 +41,11 @@ interface SpotlightControlsProps {
   onJpgBackgroundColorChange: (v: string) => void
   shapes: Array<SpotlightShape>
   selectedId: string | null
+  magnifier: MagnifierFrame | null
+  onSourceOutlinePatch: (patch: Partial<MagnifierFrame['sourceOutline']>) => void
+  onInsetOutlinePatch: (patch: Partial<MagnifierFrame['insetOutline']>) => void
+  onConnectorPatch: (patch: Partial<MagnifierFrame['connector']>) => void
+  onInsetBackgroundColorChange: (v: string) => void
   attachOutlineToNewShapes: boolean
   onAttachOutlineToNewShapesChange: (v: boolean) => void
   defaultOutlineColor: string
@@ -133,6 +138,11 @@ export function SpotlightControls({
   onJpgBackgroundColorChange,
   shapes,
   selectedId,
+  magnifier,
+  onSourceOutlinePatch,
+  onInsetOutlinePatch,
+  onConnectorPatch,
+  onInsetBackgroundColorChange,
   attachOutlineToNewShapes,
   onAttachOutlineToNewShapesChange,
   defaultOutlineColor,
@@ -250,6 +260,19 @@ export function SpotlightControls({
     }
   }
 
+  const showShapeStyleControls = shapes.length > 0 || selectedId !== null
+  const canEditMagnifier = magnifier !== null
+  const sourceOutline = magnifier?.sourceOutline ?? { color: '#2563eb', widthPx: 3 }
+  const insetOutline = magnifier?.insetOutline ?? { color: '#2563eb', widthPx: 3 }
+  const connector = magnifier?.connector ?? {
+    enabled: true,
+    color: '#2563eb',
+    widthPx: 2,
+  }
+  const insetBg = magnifier?.insetBackgroundColor ?? '#111827'
+  const connectorWidthMin = 1
+  const connectorWidthMax = 32
+
   return (
     <div className="space-y-2">
       <SegmentedTool
@@ -267,9 +290,16 @@ export function SpotlightControls({
             label: 'Ellipse',
             icon: <Circle className="size-3.5 shrink-0" aria-hidden />,
           },
+          {
+            value: 'magnifier',
+            label: 'Inset',
+            icon: <PictureInPicture className="size-3.5 shrink-0" aria-hidden />,
+          },
         ]}
       />
 
+      {showShapeStyleControls && (
+      <>
       <div className="mb-6 flex flex-col gap-3">
         <Label className="text-sm font-medium">Shape outline</Label>
         <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
@@ -355,6 +385,123 @@ export function SpotlightControls({
           </span>
         </div>
       </div>
+      </>
+      )}
+
+      {canEditMagnifier && (
+        <>
+          <div className="mb-6 flex flex-col gap-3">
+            <Label className="text-sm font-medium">Magnifier — source outline</Label>
+            <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
+              <OutlineColorSwatchPopover
+                id="spotlight-mag-source-outline"
+                value={sourceOutline.color}
+                onChange={(c) => onSourceOutlinePatch({ color: c })}
+                swatchAriaLabel="Choose source outline color"
+                disabled={!canEditMagnifier}
+              />
+              <SteppedNumberInput
+                value={sourceOutline.widthPx}
+                onChange={(w) => onSourceOutlinePatch({ widthPx: w })}
+                min={outlineWidthMin}
+                max={outlineWidthMax}
+                step={1}
+                aria-label="Source outline width in pixels"
+                disabled={!canEditMagnifier}
+                className="w-[min(100%,10rem)] shrink-0"
+              />
+              <span
+                className={cn(
+                  'shrink-0 text-xs tabular-nums',
+                  canEditMagnifier ? 'text-muted-foreground' : 'text-muted-foreground/60',
+                )}
+              >
+                px
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              The source rectangle selects what to zoom into the inset.
+            </span>
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3">
+            <Label className="text-sm font-medium">Magnifier — inset outline</Label>
+            <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
+              <OutlineColorSwatchPopover
+                id="spotlight-mag-inset-outline"
+                value={insetOutline.color}
+                onChange={(c) => onInsetOutlinePatch({ color: c })}
+                swatchAriaLabel="Choose inset outline color"
+                disabled={!canEditMagnifier}
+              />
+              <SteppedNumberInput
+                value={insetOutline.widthPx}
+                onChange={(w) => onInsetOutlinePatch({ widthPx: w })}
+                min={outlineWidthMin}
+                max={outlineWidthMax}
+                step={1}
+                aria-label="Inset outline width in pixels"
+                disabled={!canEditMagnifier}
+                className="w-[min(100%,10rem)] shrink-0"
+              />
+              <span
+                className={cn(
+                  'shrink-0 text-xs tabular-nums',
+                  canEditMagnifier ? 'text-muted-foreground' : 'text-muted-foreground/60',
+                )}
+              >
+                px
+              </span>
+            </div>
+          </div>
+
+          <div className="mb-6 flex flex-col gap-3">
+            <Label className="text-sm font-medium">Magnifier — connector</Label>
+            <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
+              <Switch
+                id="spotlight-mag-connector-toggle"
+                checked={connector.enabled}
+                onCheckedChange={(on) => onConnectorPatch({ enabled: on })}
+                disabled={!canEditMagnifier}
+                className="shrink-0"
+                aria-label="Show connector lines"
+              />
+              <OutlineColorSwatchPopover
+                id="spotlight-mag-connector-color"
+                value={connector.color}
+                onChange={(c) => onConnectorPatch({ color: c })}
+                swatchAriaLabel="Choose connector line color"
+                disabled={!canEditMagnifier || !connector.enabled}
+              />
+              <SteppedNumberInput
+                value={connector.widthPx}
+                onChange={(w) => onConnectorPatch({ widthPx: w })}
+                min={connectorWidthMin}
+                max={connectorWidthMax}
+                step={1}
+                aria-label="Connector line width in pixels"
+                disabled={!canEditMagnifier || !connector.enabled}
+                className="w-[min(100%,10rem)] shrink-0"
+              />
+              <span
+                className={cn(
+                  'shrink-0 text-xs tabular-nums',
+                  canEditMagnifier && connector.enabled
+                    ? 'text-muted-foreground'
+                    : 'text-muted-foreground/60',
+                )}
+              >
+                px
+              </span>
+            </div>
+          </div>
+
+          <BackgroundColorPicker
+            value={insetBg}
+            onChange={onInsetBackgroundColorChange}
+          />
+        </>
+      )}
 
       <SegmentedTool
         label="Effect"

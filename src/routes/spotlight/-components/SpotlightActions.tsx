@@ -3,6 +3,7 @@ import { Download, Loader2, Undo2 } from 'lucide-react'
 
 import type { SpotlightOutputFormat } from './SpotlightControls'
 import type { ImageFile } from '@/components/ImagePreview'
+import type { MagnifierFrame } from '@/lib/image-magnifier'
 import type {
   SpotlightEffect,
   SpotlightFocusArea,
@@ -22,6 +23,7 @@ function spotlightFilename(originalName: string, format: SpotlightOutputFormat):
 interface SpotlightActionsProps {
   image: ImageFile | null
   shapes: Array<SpotlightShape>
+  magnifier: MagnifierFrame | null
   effect: SpotlightEffect
   darkenStrength: number
   blurStrength: number
@@ -31,12 +33,14 @@ interface SpotlightActionsProps {
   canUndo: boolean
   onUndo: () => void
   onClearShapes: () => void
+  onClearMagnifier: () => void
   onClearAll: () => void
 }
 
 export function SpotlightActions({
   image,
   shapes,
+  magnifier,
   effect,
   darkenStrength,
   blurStrength,
@@ -46,6 +50,7 @@ export function SpotlightActions({
   canUndo,
   onUndo,
   onClearShapes,
+  onClearMagnifier,
   onClearAll,
 }: SpotlightActionsProps) {
   const [isExporting, setIsExporting] = useState(false)
@@ -65,6 +70,7 @@ export function SpotlightActions({
 
       const blob = await exportSpotlight(img, {
         shapes,
+        magnifier,
         effect,
         darkenStrength,
         blurStrength,
@@ -126,6 +132,16 @@ export function SpotlightActions({
           className="flex-1 min-w-[5rem]"
         >
           Clear shapes
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onClearMagnifier}
+          disabled={!image || !magnifier}
+          className="flex-1 min-w-[5rem]"
+        >
+          Clear magnifier
         </Button>
         <Button
           type="button"
