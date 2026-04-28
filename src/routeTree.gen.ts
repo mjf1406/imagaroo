@@ -14,6 +14,7 @@ import { Route as TransformIndexRouteImport } from './routes/transform/index'
 import { Route as SpotlightIndexRouteImport } from './routes/spotlight/index'
 import { Route as RemoveIndexRouteImport } from './routes/remove/index'
 import { Route as ReduceIndexRouteImport } from './routes/reduce/index'
+import { Route as MagnifierIndexRouteImport } from './routes/magnifier/index'
 import { Route as CropIndexRouteImport } from './routes/crop/index'
 import { Route as ConvertIndexRouteImport } from './routes/convert/index'
 
@@ -42,6 +43,11 @@ const ReduceIndexRoute = ReduceIndexRouteImport.update({
   path: '/reduce/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MagnifierIndexRoute = MagnifierIndexRouteImport.update({
+  id: '/magnifier/',
+  path: '/magnifier/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CropIndexRoute = CropIndexRouteImport.update({
   id: '/crop/',
   path: '/crop/',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/convert': typeof ConvertIndexRoute
   '/crop': typeof CropIndexRoute
+  '/magnifier': typeof MagnifierIndexRoute
   '/reduce': typeof ReduceIndexRoute
   '/remove': typeof RemoveIndexRoute
   '/spotlight': typeof SpotlightIndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/convert': typeof ConvertIndexRoute
   '/crop': typeof CropIndexRoute
+  '/magnifier': typeof MagnifierIndexRoute
   '/reduce': typeof ReduceIndexRoute
   '/remove': typeof RemoveIndexRoute
   '/spotlight': typeof SpotlightIndexRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/convert/': typeof ConvertIndexRoute
   '/crop/': typeof CropIndexRoute
+  '/magnifier/': typeof MagnifierIndexRoute
   '/reduce/': typeof ReduceIndexRoute
   '/remove/': typeof RemoveIndexRoute
   '/spotlight/': typeof SpotlightIndexRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/crop'
+    | '/magnifier'
     | '/reduce'
     | '/remove'
     | '/spotlight'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/convert'
     | '/crop'
+    | '/magnifier'
     | '/reduce'
     | '/remove'
     | '/spotlight'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/convert/'
     | '/crop/'
+    | '/magnifier/'
     | '/reduce/'
     | '/remove/'
     | '/spotlight/'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConvertIndexRoute: typeof ConvertIndexRoute
   CropIndexRoute: typeof CropIndexRoute
+  MagnifierIndexRoute: typeof MagnifierIndexRoute
   ReduceIndexRoute: typeof ReduceIndexRoute
   RemoveIndexRoute: typeof RemoveIndexRoute
   SpotlightIndexRoute: typeof SpotlightIndexRoute
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReduceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/magnifier/': {
+      id: '/magnifier/'
+      path: '/magnifier'
+      fullPath: '/magnifier'
+      preLoaderRoute: typeof MagnifierIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/crop/': {
       id: '/crop/'
       path: '/crop'
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConvertIndexRoute: ConvertIndexRoute,
   CropIndexRoute: CropIndexRoute,
+  MagnifierIndexRoute: MagnifierIndexRoute,
   ReduceIndexRoute: ReduceIndexRoute,
   RemoveIndexRoute: RemoveIndexRoute,
   SpotlightIndexRoute: SpotlightIndexRoute,

@@ -6,6 +6,7 @@ import {
   Minimize2,
   Scissors,
   Sparkles,
+  ZoomIn,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -137,6 +138,28 @@ function HomePage() {
             <Link to="/spotlight">
               <Button className="w-full" size="lg">
                 Open Spotlight
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <ZoomIn className="size-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Magnifier</CardTitle>
+            </div>
+            <CardDescription>
+              Create an inset zoom frame with connector lines, like inset maps.
+              Select an area to zoom, position the inset, then export.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/magnifier">
+              <Button className="w-full" size="lg">
+                Open Magnifier
               </Button>
             </Link>
           </CardContent>

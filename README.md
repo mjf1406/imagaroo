@@ -18,6 +18,10 @@
 - FT: added Spotlight tool to draw rectangles/ellipses, darken or blur outside
   (or inside) the shapes, and export JPG/PNG/WEBP
 
+### 2026/04/28
+
+- FT: added Magnifier tool to create inset zoom frames with connector lines and export JPG/PNG/WEBP
+
 ### 2026/01/13
 
 - UX: user can now select the background color when converting to JPG

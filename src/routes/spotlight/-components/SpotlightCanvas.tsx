@@ -229,6 +229,9 @@ export function SpotlightCanvas({
   const [loadedImg, setLoadedImg] = useState<HTMLImageElement | null>(null)
   const [isDraggingFile, setIsDraggingFile] = useState(false)
 
+  const nudgeActiveRef = useRef(false)
+  const nudgeEndTimerRef = useRef<number | null>(null)
+
   const [draft, setDraft] = useState<DraftShape | null>(null)
   const drawStartRef = useRef<{ x: number; y: number } | null>(null)
 
@@ -347,9 +350,20 @@ export function SpotlightCanvas({
     [iw, ih],
   )
 
+  const flushNudgeBurst = useCallback(() => {
+    if (nudgeEndTimerRef.current !== null) {
+      window.clearTimeout(nudgeEndTimerRef.current)
+      nudgeEndTimerRef.current = null
+    }
+    if (!nudgeActiveRef.current) return
+    nudgeActiveRef.current = false
+    onInteractionEnd(shapesRef.current)
+  }, [onInteractionEnd])
+
   const handleBackgroundPointerDown = (e: React.PointerEvent) => {
     if (!loadedImg || iw === 0 || ih === 0) return
     if (e.button !== 0) return
+    flushNudgeBurst()
 
     const { x, y } = clientToImage(e.clientX, e.clientY)
     const ix = Math.max(0, Math.min(x, iw))
@@ -507,6 +521,7 @@ export function SpotlightCanvas({
     shape: SpotlightShape,
   ) => {
     e.stopPropagation()
+    flushNudgeBurst()
     onInteractionStart()
     onSelectedIdChange(shape.id)
     moveRef.current = {
@@ -529,6 +544,7 @@ export function SpotlightCanvas({
     handle: ResizeHandle,
   ) => {
     e.stopPropagation()
+    flushNudgeBurst()
     onInteractionStart()
     onSelectedIdChange(shape.id)
     const { x, y } = clientToImage(e.clientX, e.clientY)
@@ -548,7 +564,6 @@ export function SpotlightCanvas({
   // Delete / Backspace
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== 'Delete' && e.key !== 'Backspace') return
       const t = e.target as HTMLElement
       if (
         t.tagName === 'INPUT' ||
@@ -557,24 +572,80 @@ export function SpotlightCanvas({
       ) {
         return
       }
-      if (!selectedId) return
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (!selectedId) return
+        e.preventDefault()
+        flushNudgeBurst()
+        onInteractionStart()
+        const next = shapesRef.current.filter((s) => s.id !== selectedId)
+        shapesRef.current = next
+        onShapesChange(next)
+        onSelectedIdChange(null)
+        onInteractionEnd(next)
+        return
+      }
+
+      if (
+        e.key !== 'ArrowUp' &&
+        e.key !== 'ArrowDown' &&
+        e.key !== 'ArrowLeft' &&
+        e.key !== 'ArrowRight'
+      ) {
+        return
+      }
+
+      if (!selectedId || iw === 0 || ih === 0) return
+
+      // Arrow = 1px fine, Shift+Arrow = 10px jump
+      const step = e.shiftKey ? 10 : 1
+      const dx =
+        e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
+      const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
+      if (dx === 0 && dy === 0) return
+
       e.preventDefault()
-      onInteractionStart()
-      const next = shapesRef.current.filter((s) => s.id !== selectedId)
+
+      if (!nudgeActiveRef.current) {
+        nudgeActiveRef.current = true
+        onInteractionStart()
+      }
+
+      const next = shapesRef.current.map((s) => {
+        if (s.id !== selectedId) return s
+        const nx = Math.max(0, Math.min(s.x + dx, iw - s.w))
+        const ny = Math.max(0, Math.min(s.y + dy, ih - s.h))
+        return { ...s, x: nx, y: ny }
+      })
       shapesRef.current = next
       onShapesChange(next)
-      onSelectedIdChange(null)
-      onInteractionEnd(next)
+
+      if (nudgeEndTimerRef.current !== null) {
+        window.clearTimeout(nudgeEndTimerRef.current)
+      }
+      nudgeEndTimerRef.current = window.setTimeout(() => {
+        nudgeEndTimerRef.current = null
+        if (!nudgeActiveRef.current) return
+        nudgeActiveRef.current = false
+        onInteractionEnd(shapesRef.current)
+      }, 400)
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    const onBlur = () => flushNudgeBurst()
+    window.addEventListener('blur', onBlur)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('blur', onBlur)
+    }
   }, [
     selectedId,
-    shapes,
+    iw,
+    ih,
     onShapesChange,
     onSelectedIdChange,
     onInteractionStart,
     onInteractionEnd,
+    flushNudgeBurst,
   ])
 
   const handleFileList = (files: FileList | null) => {

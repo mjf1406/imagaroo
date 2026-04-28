@@ -6,6 +6,7 @@ import {
   Minimize2,
   Scissors,
   Sparkles,
+  ZoomIn,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ThemeSwitch } from '@/components/themes/theme-switch'
@@ -125,6 +126,25 @@ export default function Navbar() {
         >
           <Lightbulb className="size-4" />
           <span className="hidden lg:inline">Spotlight</span>
+        </Link>
+
+        <Link
+          to="/magnifier"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+            'hover:bg-muted hover:text-foreground',
+            'text-muted-foreground',
+          )}
+          activeProps={{
+            className: cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
+              'text-foreground',
+            ),
+          }}
+        >
+          <ZoomIn className="size-4" />
+          <span className="hidden lg:inline">Magnifier</span>
         </Link>
 
         <Link
