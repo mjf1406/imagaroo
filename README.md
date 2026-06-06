@@ -6,6 +6,10 @@
 
 ## Change Log
 
+### 2026/06/06
+
+- FT: added Poster tool to tile images across printable pages (A4, A3, Letter) with draggable preview, crop marks, page coordinates, and multi-page PDF export
+
 - FT: feature
 - UX: user experience
 - UI: user interface

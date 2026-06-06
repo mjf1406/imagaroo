@@ -2,6 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   Eraser,
   ImageIcon,
+  LayoutGrid,
   Lightbulb,
   Minimize2,
   Scissors,
@@ -159,6 +160,28 @@ function HomePage() {
             <Link to="/transform">
               <Button className="w-full" size="lg">
                 Open Transformer
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-lg transition-shadow">
+          <CardHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="rounded-lg bg-primary/10 p-2">
+                <LayoutGrid className="size-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl">Poster</CardTitle>
+            </div>
+            <CardDescription>
+              Split an image across multiple pages to print and assemble into a
+              poster. Supports A4, A3, and Letter with PDF output.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/poster">
+              <Button className="w-full" size="lg">
+                Open Poster
               </Button>
             </Link>
           </CardContent>

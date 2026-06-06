@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import {
   Eraser,
   ImageIcon,
+  LayoutGrid,
   Lightbulb,
   Minimize2,
   Scissors,
@@ -144,6 +145,25 @@ export default function Navbar() {
         >
           <Sparkles className="size-4" />
           <span className="hidden lg:inline">Transform</span>
+        </Link>
+
+        <Link
+          to="/poster"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+            'hover:bg-muted hover:text-foreground',
+            'text-muted-foreground',
+          )}
+          activeProps={{
+            className: cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap',
+              'border-b-4 border-primary hover:bg-muted hover:text-foreground',
+              'text-foreground',
+            ),
+          }}
+        >
+          <LayoutGrid className="size-4" />
+          <span className="hidden lg:inline">Poster</span>
         </Link>
       </div>
 
