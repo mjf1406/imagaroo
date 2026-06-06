@@ -64,8 +64,8 @@ function HomePage() {
               <CardTitle className="text-2xl">Crop</CardTitle>
             </div>
             <CardDescription>
-              Automatically crop images by detecting content boundaries.
-              Remove unnecessary whitespace from your images.
+              Automatically crop images by detecting content boundaries, or
+              manually draw a crop region on a single image.
             </CardDescription>
           </CardHeader>
           <CardContent>

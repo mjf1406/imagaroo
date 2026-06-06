@@ -2,52 +2,48 @@ import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { ImageFile } from '@/components/ImagePreview'
-import { autoCropImage, type CropOutputFormat } from '@/lib/image-cropper'
+import type { CropRect, CropOutputFormat } from '@/lib/image-cropper'
+import { cropImageToRect } from '@/lib/image-cropper'
 import { changeFileExtension } from '@/lib/image-converter'
-import { createZip, downloadBlob } from '@/lib/zip-utils'
+import { downloadBlob } from '@/lib/zip-utils'
 
-interface CropActionsProps {
-  images: ImageFile[]
+interface ManualCropActionsProps {
+  image: ImageFile | null
+  cropRect: CropRect | null
   outputFormat: CropOutputFormat
   jpgBackgroundColor: string
   onClear: () => void
 }
 
-export function CropActions({
-  images,
+export function ManualCropActions({
+  image,
+  cropRect,
   outputFormat,
   jpgBackgroundColor,
   onClear,
-}: CropActionsProps) {
+}: ManualCropActionsProps) {
   const [isCropping, setIsCropping] = useState(false)
 
+  const canCrop =
+    !!image &&
+    !!cropRect &&
+    cropRect.w >= 1 &&
+    cropRect.h >= 1
+
   const handleCrop = async () => {
-    if (images.length === 0) return
+    if (!image || !cropRect || !canCrop) return
 
     setIsCropping(true)
 
     try {
-      const croppedFiles: Array<{ name: string; blob: Blob }> = []
-
-      for (const image of images) {
-        const blob = await autoCropImage(
-          image.file,
-          outputFormat,
-          outputFormat === 'jpg' ? jpgBackgroundColor : undefined,
-        )
-        const newFilename = changeFileExtension(image.file.name, outputFormat)
-        croppedFiles.push({ name: newFilename, blob })
-      }
-
-      if (croppedFiles.length === 1) {
-        // Single file download
-        downloadBlob(croppedFiles[0].blob, croppedFiles[0].name)
-      } else {
-        // Multiple files - create ZIP
-        const zipBlob = await createZip(croppedFiles)
-        downloadBlob(zipBlob, 'cropped-images.zip')
-      }
-
+      const blob = await cropImageToRect(
+        image.file,
+        cropRect,
+        outputFormat,
+        outputFormat === 'jpg' ? jpgBackgroundColor : undefined,
+      )
+      const newFilename = changeFileExtension(image.file.name, outputFormat)
+      downloadBlob(blob, newFilename)
       onClear()
     } catch (error) {
       console.error('Cropping error:', error)
@@ -61,7 +57,7 @@ export function CropActions({
     <div className="flex gap-4">
       <Button
         onClick={handleCrop}
-        disabled={isCropping || images.length === 0}
+        disabled={isCropping || !canCrop}
         size="lg"
         className="flex-1"
       >
@@ -73,8 +69,7 @@ export function CropActions({
         ) : (
           <>
             <Download className="mr-2 size-4" />
-            Crop & Download{' '}
-            {images.length > 1 ? `(${images.length} files)` : ''}
+            Crop & Download
           </>
         )}
       </Button>
@@ -82,7 +77,7 @@ export function CropActions({
         onClick={onClear}
         variant="outline"
         size="lg"
-        disabled={isCropping || images.length === 0}
+        disabled={isCropping || !image}
       >
         Clear
       </Button>

@@ -86,7 +86,7 @@ function TransformImagePage() {
               onRemoveChange={setRemove}
               onReduceChange={setReduce}
             />
-            <OutputFormatSelector
+            <OutputFormatSelector<'png' | 'webp'>
               value={outputFormat}
               onChange={setOutputFormat}
             />

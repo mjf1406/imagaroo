@@ -1,6 +1,120 @@
+export type CropRect = { x: number; y: number; w: number; h: number }
+export type CropOutputFormat = 'jpg' | 'png' | 'webp'
+
+function fillJpgBackground(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  backgroundColor: string,
+): void {
+  ctx.fillStyle = backgroundColor
+  ctx.fillRect(0, 0, width, height)
+}
+
+function blobFromCanvas(
+  canvas: HTMLCanvasElement,
+  outputFormat: CropOutputFormat,
+): Promise<Blob> {
+  const mime =
+    outputFormat === 'jpg'
+      ? 'image/jpeg'
+      : outputFormat === 'webp'
+        ? 'image/webp'
+        : 'image/png'
+  const quality = outputFormat === 'png' ? undefined : 0.92
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) =>
+        blob ? resolve(blob) : reject(new Error('Failed to convert image')),
+      mime,
+      quality,
+    )
+  })
+}
+
+function clampCropRect(
+  rect: CropRect,
+  imageWidth: number,
+  imageHeight: number,
+): CropRect {
+  const x = Math.max(0, Math.min(rect.x, imageWidth - 1))
+  const y = Math.max(0, Math.min(rect.y, imageHeight - 1))
+  const w = Math.max(1, Math.min(rect.w, imageWidth - x))
+  const h = Math.max(1, Math.min(rect.h, imageHeight - y))
+  return { x, y, w, h }
+}
+
+export function fullImageCropRect(
+  imageWidth: number,
+  imageHeight: number,
+): CropRect {
+  return { x: 0, y: 0, w: imageWidth, h: imageHeight }
+}
+
+export async function cropImageToRect(
+  file: File,
+  rect: CropRect,
+  outputFormat: CropOutputFormat,
+  jpgBackgroundColor = '#ffffff',
+): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const crop = clampCropRect(rect, img.naturalWidth, img.naturalHeight)
+        const cropWidth = Math.round(crop.w)
+        const cropHeight = Math.round(crop.h)
+
+        const croppedCanvas = document.createElement('canvas')
+        croppedCanvas.width = cropWidth
+        croppedCanvas.height = cropHeight
+
+        const croppedCtx = croppedCanvas.getContext('2d')
+        if (!croppedCtx) {
+          reject(new Error('Failed to get cropped canvas context'))
+          return
+        }
+
+        if (outputFormat === 'jpg') {
+          fillJpgBackground(croppedCtx, cropWidth, cropHeight, jpgBackgroundColor)
+        }
+
+        croppedCtx.drawImage(
+          img,
+          crop.x,
+          crop.y,
+          crop.w,
+          crop.h,
+          0,
+          0,
+          cropWidth,
+          cropHeight,
+        )
+
+        blobFromCanvas(croppedCanvas, outputFormat).then(resolve).catch(reject)
+      }
+
+      img.onerror = () => reject(new Error('Failed to load image'))
+
+      if (e.target?.result) {
+        img.src = e.target.result as string
+      } else {
+        reject(new Error('Failed to read file'))
+      }
+    }
+
+    reader.onerror = () => reject(new Error('Failed to read file'))
+    reader.readAsDataURL(file)
+  })
+}
+
 export async function autoCropImage(
   file: File,
-  outputFormat: 'png' | 'webp',
+  outputFormat: CropOutputFormat,
+  jpgBackgroundColor = '#ffffff',
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -50,14 +164,26 @@ export async function autoCropImage(
         }
 
         if (minX > maxX || minY > maxY) {
-          canvas.toBlob(
-            (blob) =>
-              blob
-                ? resolve(blob)
-                : reject(new Error('Failed to convert image')),
-            outputFormat === 'png' ? 'image/png' : 'image/webp',
-            outputFormat === 'png' ? undefined : 0.92,
-          )
+          if (outputFormat === 'jpg') {
+            const exportCanvas = document.createElement('canvas')
+            exportCanvas.width = canvas.width
+            exportCanvas.height = canvas.height
+            const exportCtx = exportCanvas.getContext('2d')
+            if (!exportCtx) {
+              reject(new Error('Failed to get canvas context'))
+              return
+            }
+            fillJpgBackground(
+              exportCtx,
+              exportCanvas.width,
+              exportCanvas.height,
+              jpgBackgroundColor,
+            )
+            exportCtx.drawImage(canvas, 0, 0)
+            blobFromCanvas(exportCanvas, outputFormat).then(resolve).catch(reject)
+          } else {
+            blobFromCanvas(canvas, outputFormat).then(resolve).catch(reject)
+          }
           return
         }
 
@@ -80,6 +206,15 @@ export async function autoCropImage(
           return
         }
 
+        if (outputFormat === 'jpg') {
+          fillJpgBackground(
+            croppedCtx,
+            cropWidth,
+            cropHeight,
+            jpgBackgroundColor,
+          )
+        }
+
         croppedCtx.drawImage(
           canvas,
           minX,
@@ -92,14 +227,7 @@ export async function autoCropImage(
           cropHeight,
         )
 
-        croppedCanvas.toBlob(
-          (blob) =>
-            blob
-              ? resolve(blob)
-              : reject(new Error('Failed to convert cropped image')),
-          outputFormat === 'png' ? 'image/png' : 'image/webp',
-          outputFormat === 'png' ? undefined : 0.92,
-        )
+        blobFromCanvas(croppedCanvas, outputFormat).then(resolve).catch(reject)
       }
 
       img.onerror = () => reject(new Error('Failed to load image'))

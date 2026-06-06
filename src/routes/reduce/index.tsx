@@ -59,7 +59,7 @@ function ReduceImagePage() {
         {/* Right side: Controls (always visible) */}
         <div className="md:w-80 md:shrink-0">
           <div className="space-y-4">
-            <OutputFormatSelector
+            <OutputFormatSelector<'png' | 'webp'>
               value={outputFormat}
               onChange={setOutputFormat}
             />
