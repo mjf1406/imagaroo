@@ -52,6 +52,37 @@ export function fullImageCropRect(
   return { x: 0, y: 0, w: imageWidth, h: imageHeight }
 }
 
+const EDITOR_MIN_SIZE = 4
+
+export function clampCropRectForEditor(
+  rect: CropRect,
+  imageWidth: number,
+  imageHeight: number,
+  minSize = EDITOR_MIN_SIZE,
+): CropRect {
+  let { x, y, w, h } = rect
+  x = Math.max(0, Math.min(x, imageWidth - minSize))
+  y = Math.max(0, Math.min(y, imageHeight - minSize))
+  w = Math.max(minSize, Math.min(w, imageWidth - x))
+  h = Math.max(minSize, Math.min(h, imageHeight - y))
+  return { x, y, w, h }
+}
+
+export function resizeCropRectCentered(
+  rect: CropRect,
+  newW: number,
+  newH: number,
+  imageWidth: number,
+  imageHeight: number,
+  minSize = EDITOR_MIN_SIZE,
+): CropRect {
+  const w = Math.max(minSize, Math.min(newW, imageWidth))
+  const h = Math.max(minSize, Math.min(newH, imageHeight))
+  let x = rect.x + (rect.w - w) / 2
+  let y = rect.y + (rect.h - h) / 2
+  return clampCropRectForEditor({ x, y, w, h }, imageWidth, imageHeight, minSize)
+}
+
 export async function cropImageToRect(
   file: File,
   rect: CropRect,
