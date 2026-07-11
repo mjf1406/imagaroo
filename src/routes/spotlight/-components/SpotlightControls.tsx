@@ -24,6 +24,8 @@ import type { MagnifierFrame } from '@/lib/image-magnifier'
 
 export type SpotlightOutputFormat = 'jpg' | 'png' | 'webp'
 
+export type SpotlightAnimationFormat = 'gif' | 'mp4'
+
 interface SpotlightControlsProps {
   tool: SpotlightTool
   onToolChange: (tool: SpotlightTool) => void
@@ -71,6 +73,12 @@ interface SpotlightControlsProps {
   onAddFillToShape: (shapeId: string) => void
   onRemoveFillFromShape: (shapeId: string) => void
   onStrengthReset: () => void
+  animationFormat: SpotlightAnimationFormat
+  onAnimationFormatChange: (v: SpotlightAnimationFormat) => void
+  transitionDurationSec: number
+  onTransitionDurationSecChange: (v: number) => void
+  holdDurationSec: number
+  onHoldDurationSecChange: (v: number) => void
 }
 
 function SegmentedTool<T extends string>({
@@ -162,6 +170,12 @@ export function SpotlightControls({
   onAddFillToShape,
   onRemoveFillFromShape,
   onStrengthReset,
+  animationFormat,
+  onAnimationFormatChange,
+  transitionDurationSec,
+  onTransitionDurationSecChange,
+  holdDurationSec,
+  onHoldDurationSecChange,
 }: SpotlightControlsProps) {
   const strength =
     effect === 'darken' ? darkenStrength : blurStrength
@@ -629,6 +643,116 @@ export function SpotlightControls({
           onChange={onJpgBackgroundColorChange}
         />
       )}
+
+      <div className="mb-2 border-t border-border pt-6">
+        <Label className="text-sm font-medium">Animation export</Label>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Export a clip that fades from the full image into the spotlight effect.
+        </p>
+      </div>
+
+      <SegmentedTool
+        label="Animation format"
+        value={animationFormat}
+        onChange={onAnimationFormatChange}
+        options={[
+          { value: 'mp4', label: 'MP4' },
+          { value: 'gif', label: 'GIF' },
+        ]}
+      />
+
+      <div className="mb-6 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <Label className="text-sm font-medium shrink-0">Transition duration</Label>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <SteppedNumberInput
+              value={transitionDurationSec}
+              onChange={onTransitionDurationSecChange}
+              min={0.5}
+              max={15}
+              step={0.5}
+              integerMode={false}
+              aria-label="Transition duration in seconds"
+              className="max-w-[11rem] flex-1 sm:max-w-[13rem]"
+            />
+            <span className="text-xs text-muted-foreground tabular-nums shrink-0">
+              sec
+            </span>
+          </div>
+        </div>
+        <input
+          type="range"
+          min={0.5}
+          max={15}
+          step={0.5}
+          value={transitionDurationSec}
+          onChange={(e) =>
+            onTransitionDurationSecChange(Number(e.target.value))
+          }
+          className={cn(
+            'h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted',
+            '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4',
+            '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer',
+            '[&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background',
+            '[&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full',
+            '[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2',
+            '[&::-moz-range-thumb]:border-background [&::-moz-range-thumb]:shadow-sm',
+            '[&::-moz-range-track]:bg-muted [&::-moz-range-track]:rounded-lg',
+          )}
+          aria-label="Transition duration slider"
+        />
+        <span className="text-xs text-muted-foreground">
+          How long the darken/blur effect takes to reach full strength.
+        </span>
+      </div>
+
+      <div className="mb-6 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-2">
+          <Label className="text-sm font-medium shrink-0">Hold duration</Label>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <SteppedNumberInput
+              value={holdDurationSec}
+              onChange={onHoldDurationSecChange}
+              min={0}
+              max={10}
+              step={0.5}
+              integerMode={false}
+              aria-label="Hold duration in seconds"
+              className="max-w-[11rem] flex-1 sm:max-w-[13rem]"
+            />
+            <span className="text-xs text-muted-foreground tabular-nums shrink-0">
+              sec
+            </span>
+          </div>
+        </div>
+        <input
+          type="range"
+          min={0}
+          max={10}
+          step={0.5}
+          value={holdDurationSec}
+          onChange={(e) => onHoldDurationSecChange(Number(e.target.value))}
+          className={cn(
+            'h-2 w-full cursor-pointer appearance-none rounded-lg bg-muted',
+            '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4',
+            '[&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer',
+            '[&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-background',
+            '[&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full',
+            '[&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-2',
+            '[&::-moz-range-thumb]:border-background [&::-moz-range-thumb]:shadow-sm',
+            '[&::-moz-range-track]:bg-muted [&::-moz-range-track]:rounded-lg',
+          )}
+          aria-label="Hold duration slider"
+        />
+        <span className="text-xs text-muted-foreground">
+          How long to keep the final spotlight frame before the clip ends.
+        </span>
+        {animationFormat === 'mp4' && (
+          <span className="text-xs text-muted-foreground">
+            MP4 is used when supported; otherwise the download falls back to WebM.
+          </span>
+        )}
+      </div>
     </div>
   )
 }
