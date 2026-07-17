@@ -66,6 +66,35 @@ export function PosterCanvas({
     const mmToPxX = (mm: number) => (mm / layout.posterW) * cw
     const mmToPxY = (mm: number) => (mm / layout.posterH) * ch
 
+    const strokeSheetGrid = () => {
+      for (let row = 0; row < layout.sheetsTall; row++) {
+        for (let col = 0; col < layout.sheetsWide; col++) {
+          const page = pagePosterRect(col, row, layout)
+          const px = mmToPxX(page.x)
+          const py = mmToPxY(page.y)
+          const pw = mmToPxX(page.w)
+          const ph = mmToPxY(page.h)
+
+          ctx.strokeStyle = '#94a3b8'
+          ctx.lineWidth = 1
+          ctx.setLineDash([])
+          ctx.strokeRect(px + 0.5, py + 0.5, pw - 1, ph - 1)
+
+          const marginPxX = mmToPxX((layout.paperW - layout.printableW) / 2)
+          const marginPxY = mmToPxY((layout.paperH - layout.printableH) / 2)
+          ctx.strokeStyle = '#cbd5e1'
+          ctx.setLineDash([4, 4])
+          ctx.strokeRect(
+            px + marginPxX,
+            py + marginPxY,
+            pw - 2 * marginPxX,
+            ph - 2 * marginPxY,
+          )
+          ctx.setLineDash([])
+        }
+      }
+    }
+
     ctx.fillStyle = '#e5e7eb'
     ctx.fillRect(0, 0, cw, ch)
 
@@ -79,21 +108,9 @@ export function PosterCanvas({
 
         ctx.fillStyle = '#ffffff'
         ctx.fillRect(px, py, pw, ph)
-        ctx.strokeStyle = '#94a3b8'
-        ctx.lineWidth = 1
-        ctx.strokeRect(px + 0.5, py + 0.5, pw - 1, ph - 1)
 
         const marginPxX = mmToPxX((layout.paperW - layout.printableW) / 2)
         const marginPxY = mmToPxY((layout.paperH - layout.printableH) / 2)
-        ctx.strokeStyle = '#cbd5e1'
-        ctx.setLineDash([4, 4])
-        ctx.strokeRect(
-          px + marginPxX,
-          py + marginPxY,
-          pw - 2 * marginPxX,
-          ph - 2 * marginPxY,
-        )
-        ctx.setLineDash([])
 
         if (showPageCoords) {
           ctx.fillStyle = '#64748b'
@@ -147,6 +164,9 @@ export function PosterCanvas({
       }
     }
 
+    // Underlay grid (visible in slack / gutters around the image)
+    strokeSheetGrid()
+
     const ir = layout.imageRect
     const ix = mmToPxX(ir.x)
     const iy = mmToPxY(ir.y)
@@ -154,6 +174,10 @@ export function PosterCanvas({
     const ih = mmToPxY(ir.h)
 
     ctx.drawImage(img, ix, iy, iw, ih)
+
+    // Overlay grid so sheet borders stay visible over the photo
+    strokeSheetGrid()
+
     ctx.strokeStyle = 'hsl(var(--primary))'
     ctx.lineWidth = 2
     ctx.setLineDash([6, 4])
