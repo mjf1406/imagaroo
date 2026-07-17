@@ -10,7 +10,7 @@ import type {
 } from './-components/SpotlightCanvas'
 import { SpotlightControls } from './-components/SpotlightControls'
 import { SpotlightPageHeader } from './-components/SpotlightPageHeader'
-import type { SpotlightOutputFormat } from './-components/SpotlightControls'
+import type { SpotlightOutputFormat, SpotlightAnimationFormat } from './-components/SpotlightControls'
 
 import type { ImageFile } from '@/components/ImagePreview'
 import type { MagnifierFrame } from '@/lib/image-magnifier'
@@ -65,6 +65,10 @@ function SpotlightImagePage() {
   const [focusArea, setFocusArea] = useState<SpotlightFocusArea>('inside')
   const [outputFormat, setOutputFormat] =
     useState<SpotlightOutputFormat>('webp')
+  const [animationFormat, setAnimationFormat] =
+    useState<SpotlightAnimationFormat>('mp4')
+  const [transitionDurationSec, setTransitionDurationSec] = useState(2)
+  const [holdDurationSec, setHoldDurationSec] = useState(1)
   const [jpgBackgroundColor, setJpgBackgroundColor] = useState('#ffffff')
   const [attachOutlineToNewShapes, setAttachOutlineToNewShapes] =
     useState(false)
@@ -360,6 +364,12 @@ function SpotlightImagePage() {
             onAddFillToShape={addFillToShape}
             onRemoveFillFromShape={removeFillFromShape}
             onStrengthReset={resetStrength}
+            animationFormat={animationFormat}
+            onAnimationFormatChange={setAnimationFormat}
+            transitionDurationSec={transitionDurationSec}
+            onTransitionDurationSecChange={setTransitionDurationSec}
+            holdDurationSec={holdDurationSec}
+            onHoldDurationSecChange={setHoldDurationSec}
           />
           <SpotlightActions
             image={image}
@@ -371,6 +381,9 @@ function SpotlightImagePage() {
             focusArea={focusArea}
             outputFormat={outputFormat}
             jpgBackgroundColor={jpgBackgroundColor}
+            animationFormat={animationFormat}
+            transitionDurationSec={transitionDurationSec}
+            holdDurationSec={holdDurationSec}
             canUndo={past.length > 0}
             onUndo={handleUndo}
             onClearShapes={handleClearShapes}

@@ -8,6 +8,7 @@ import { CropImagePageHeader } from './-components/CropImagePageHeader'
 import { CropModeToggle } from './-components/CropModeToggle'
 import type { CropMode } from './-components/CropModeToggle'
 import { ManualCropActions } from './-components/ManualCropActions'
+import { ManualCropSizeControls } from './-components/ManualCropSizeControls'
 import { OutputFormatSelector } from './-components/OutputFormatSelector'
 import type { ImageFile } from '@/components/ImagePreview'
 import type { CropRect, CropOutputFormat } from '@/lib/image-cropper'
@@ -185,13 +186,20 @@ function CropImagePage() {
                 onClear={handleClear}
               />
             ) : (
-              <ManualCropActions
-                image={manualImage}
-                cropRect={cropRect}
-                outputFormat={outputFormat}
-                jpgBackgroundColor={jpgBackgroundColor}
-                onClear={handleManualClear}
-              />
+              <>
+                <ManualCropSizeControls
+                  image={manualImage}
+                  cropRect={cropRect}
+                  onRectChange={setCropRect}
+                />
+                <ManualCropActions
+                  image={manualImage}
+                  cropRect={cropRect}
+                  outputFormat={outputFormat}
+                  jpgBackgroundColor={jpgBackgroundColor}
+                  onClear={handleManualClear}
+                />
+              </>
             )}
           </div>
         </div>

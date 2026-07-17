@@ -3,7 +3,7 @@ import type { RefObject } from 'react'
 import { Upload } from 'lucide-react'
 
 import type { ImageFile } from '@/components/ImagePreview'
-import type { CropRect } from '@/lib/image-cropper'
+import { clampCropRectForEditor, type CropRect } from '@/lib/image-cropper'
 import { isValidImageType } from '@/lib/image-converter'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -105,12 +105,71 @@ function applyResizeRect(
 }
 
 function clampRectToImage(rect: CropRect, iw: number, ih: number): CropRect {
-  let { x, y, w, h } = rect
-  x = Math.max(0, Math.min(x, iw - MIN_SIZE))
-  y = Math.max(0, Math.min(y, ih - MIN_SIZE))
-  w = Math.max(MIN_SIZE, Math.min(w, iw - x))
-  h = Math.max(MIN_SIZE, Math.min(h, ih - y))
-  return { x, y, w, h }
+  return clampCropRectForEditor(rect, iw, ih, MIN_SIZE)
+}
+
+const DIM_LABEL_MIN_INSIDE = 48
+
+function CropDimensionLabel({
+  rect,
+  displayScale,
+  imageHeight,
+}: {
+  rect: CropRect
+  displayScale: number
+  imageHeight: number
+}) {
+  const w = Math.round(rect.w)
+  const h = Math.round(rect.h)
+  const label = `${w} × ${h} px`
+  const fontSize = 12 / displayScale
+  const padX = 6 / displayScale
+  const padY = 3 / displayScale
+  const charWidth = fontSize * 0.55
+  const textW = label.length * charWidth
+  const textH = fontSize * 1.2
+
+  const inside =
+    rect.w >= DIM_LABEL_MIN_INSIDE && rect.h >= DIM_LABEL_MIN_INSIDE
+  const cx = rect.x + rect.w / 2
+  const gap = 6 / displayScale
+  const cy = inside
+    ? rect.y + rect.h / 2
+    : Math.min(
+        rect.y + rect.h + gap + textH / 2 + padY,
+        imageHeight - textH / 2 - padY,
+      )
+
+  const bgX = cx - textW / 2 - padX
+  const bgY = cy - textH / 2 - padY
+  const bgW = textW + padX * 2
+  const bgH = textH + padY * 2
+
+  return (
+    <g pointerEvents="none">
+      <rect
+        x={bgX}
+        y={bgY}
+        width={bgW}
+        height={bgH}
+        rx={4 / displayScale}
+        ry={4 / displayScale}
+        fill="rgba(0,0,0,0.6)"
+      />
+      <text
+        x={cx}
+        y={cy}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fontSize={fontSize}
+        fill="white"
+        fontFamily="system-ui, sans-serif"
+        fontWeight={500}
+      >
+        {label}
+      </text>
+    </g>
+  )
 }
 
 function handleHitBox(
@@ -1027,6 +1086,12 @@ export function CropCanvas({
                   vectorEffect="non-scaling-stroke"
                   style={{ cursor: 'move', pointerEvents: 'auto' }}
                   onPointerDown={handleRectPointerDown}
+                />
+
+                <CropDimensionLabel
+                  rect={displayRect}
+                  displayScale={displayScale}
+                  imageHeight={ih}
                 />
 
                 {!draft &&

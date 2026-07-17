@@ -49,7 +49,7 @@ export default function Navbar() {
           }}
         >
           <ImageIcon className="size-4" />
-          <span className="hidden lg:inline">Convert</span>
+          <span className="hidden xl:inline">Convert</span>
         </Link>
 
         <Link
@@ -68,7 +68,7 @@ export default function Navbar() {
           }}
         >
           <Scissors className="size-4" />
-          <span className="hidden lg:inline">Crop</span>
+          <span className="hidden xl:inline">Crop</span>
         </Link>
 
         <Link
@@ -87,7 +87,7 @@ export default function Navbar() {
           }}
         >
           <Eraser className="size-4" />
-          <span className="hidden lg:inline">Remove BG</span>
+          <span className="hidden xl:inline">Remove BG</span>
         </Link>
 
         <Link
@@ -106,7 +106,7 @@ export default function Navbar() {
           }}
         >
           <Minimize2 className="size-4" />
-          <span className="hidden lg:inline">Reduce</span>
+          <span className="hidden xl:inline">Reduce</span>
         </Link>
 
         <Link
@@ -125,7 +125,7 @@ export default function Navbar() {
           }}
         >
           <Lightbulb className="size-4" />
-          <span className="hidden lg:inline">Spotlight</span>
+          <span className="hidden xl:inline">Spotlight</span>
         </Link>
 
         <Link
@@ -144,7 +144,7 @@ export default function Navbar() {
           }}
         >
           <Sparkles className="size-4" />
-          <span className="hidden lg:inline">Transform</span>
+          <span className="hidden xl:inline">Transform</span>
         </Link>
 
         <Link
@@ -163,7 +163,7 @@ export default function Navbar() {
           }}
         >
           <LayoutGrid className="size-4" />
-          <span className="hidden lg:inline">Poster</span>
+          <span className="hidden xl:inline">Poster</span>
         </Link>
       </div>
 
