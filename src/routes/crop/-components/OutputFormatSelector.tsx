@@ -1,7 +1,7 @@
+import type { CropOutputFormat } from '@/lib/image-cropper'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import type { CropOutputFormat } from '@/lib/image-cropper'
 import { BackgroundColorPicker } from '@/routes/convert/-components/BackgroundColorPicker'
 
 interface OutputFormatSelectorProps<
@@ -14,7 +14,10 @@ interface OutputFormatSelectorProps<
   onJpgBackgroundColorChange?: (value: string) => void
 }
 
-const DEFAULT_FORMATS = ['webp', 'png'] as const satisfies Array<CropOutputFormat>
+const DEFAULT_FORMATS = [
+  'webp',
+  'png',
+] as const satisfies Array<CropOutputFormat>
 
 export function OutputFormatSelector<
   F extends CropOutputFormat = CropOutputFormat,

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 
 import type { ImageFile } from '@/components/ImagePreview'
+import type { CropRect } from '@/lib/image-cropper'
 import { SteppedNumberInput } from '@/components/SteppedNumberInput'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import type { CropRect } from '@/lib/image-cropper'
 import { resizeCropRectCentered } from '@/lib/image-cropper'
 
 const MIN_CROP_SIZE = 4
@@ -59,10 +59,7 @@ export function ManualCropSizeControls({
     let newHeight = Math.round(cropRect.h)
     if (dimensionsLinked && cropRect.h > 0) {
       const aspectRatio = cropRect.h / cropRect.w
-      newHeight = Math.max(
-        MIN_CROP_SIZE,
-        Math.round(newWidth * aspectRatio),
-      )
+      newHeight = Math.max(MIN_CROP_SIZE, Math.round(newWidth * aspectRatio))
     }
 
     onRectChange(
@@ -83,10 +80,7 @@ export function ManualCropSizeControls({
     let newWidth = Math.round(cropRect.w)
     if (dimensionsLinked && cropRect.w > 0) {
       const aspectRatio = cropRect.w / cropRect.h
-      newWidth = Math.max(
-        MIN_CROP_SIZE,
-        Math.round(newHeight * aspectRatio),
-      )
+      newWidth = Math.max(MIN_CROP_SIZE, Math.round(newHeight * aspectRatio))
     }
 
     onRectChange(

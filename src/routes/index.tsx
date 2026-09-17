@@ -86,8 +86,8 @@ function HomePage() {
               <CardTitle className="text-2xl">Remove Background</CardTitle>
             </div>
             <CardDescription>
-              Automatically remove backgrounds from images. Works best with
-              images that have a single solid background.
+              Remove backgrounds in your browser. Standard works on most
+              devices; Quality uses a larger model when WebGPU is available.
             </CardDescription>
           </CardHeader>
           <CardContent>

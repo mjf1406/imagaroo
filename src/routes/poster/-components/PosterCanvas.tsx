@@ -9,8 +9,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 
-const POSTER_ACCEPT =
-  'image/jpeg,image/jpg,image/png,image/webp,image/avif'
+const POSTER_ACCEPT = 'image/jpeg,image/jpg,image/png,image/webp,image/avif'
 
 interface PosterCanvasProps {
   image: ImageFile | null
@@ -327,7 +326,9 @@ export function PosterCanvas({
     >
       {isDraggingFile && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-primary/10 border-2 border-dashed border-primary pointer-events-none rounded-lg">
-          <p className="text-sm font-medium text-primary">Drop to replace image</p>
+          <p className="text-sm font-medium text-primary">
+            Drop to replace image
+          </p>
         </div>
       )}
       <div className="relative mx-auto flex w-full max-w-full justify-center p-2">

@@ -5,7 +5,7 @@ declare module 'gifenc' {
       width: number,
       height: number,
       options?: {
-        palette?: number[][]
+        palette?: Array<Array<number>>
         delay?: number
         first?: boolean
       },
@@ -19,11 +19,11 @@ declare module 'gifenc' {
     data: Uint8ClampedArray | Uint8Array,
     maxColors: number,
     options?: Record<string, unknown>,
-  ): number[][]
+  ): Array<Array<number>>
 
   export function applyPalette(
     data: Uint8ClampedArray | Uint8Array,
-    palette: number[][],
+    palette: Array<Array<number>>,
     format?: string,
   ): Uint8Array
 }

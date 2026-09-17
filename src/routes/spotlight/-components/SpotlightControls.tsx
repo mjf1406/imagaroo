@@ -9,6 +9,7 @@ import type {
   SpotlightShapeFillStyle,
   SpotlightShapeOutlineStyle,
 } from '@/lib/image-spotlight'
+import type { MagnifierFrame } from '@/lib/image-magnifier'
 import {
   clampSpotlightFillOpacityPct,
   clampSpotlightOutlineWidthPx,
@@ -20,7 +21,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 import { BackgroundColorPicker } from '@/routes/convert/-components/BackgroundColorPicker'
-import type { MagnifierFrame } from '@/lib/image-magnifier'
 
 export type SpotlightOutputFormat = 'jpg' | 'png' | 'webp'
 
@@ -44,7 +44,9 @@ interface SpotlightControlsProps {
   shapes: Array<SpotlightShape>
   selectedId: string | null
   magnifier: MagnifierFrame | null
-  onSourceOutlinePatch: (patch: Partial<MagnifierFrame['sourceOutline']>) => void
+  onSourceOutlinePatch: (
+    patch: Partial<MagnifierFrame['sourceOutline']>,
+  ) => void
   onInsetOutlinePatch: (patch: Partial<MagnifierFrame['insetOutline']>) => void
   onConnectorPatch: (patch: Partial<MagnifierFrame['connector']>) => void
   onInsetBackgroundColorChange: (v: string) => void
@@ -177,16 +179,18 @@ export function SpotlightControls({
   holdDurationSec,
   onHoldDurationSecChange,
 }: SpotlightControlsProps) {
-  const strength =
-    effect === 'darken' ? darkenStrength : blurStrength
-  const onStrengthChange = effect === 'darken' ? onDarkenStrengthChange : onBlurStrengthChange
+  const strength = effect === 'darken' ? darkenStrength : blurStrength
+  const onStrengthChange =
+    effect === 'darken' ? onDarkenStrengthChange : onBlurStrengthChange
   const min = effect === 'darken' ? 0 : 0
   const max = effect === 'darken' ? 100 : 50
   const step = effect === 'darken' ? 1 : 1
   const suffix = effect === 'darken' ? '%' : 'px'
 
   const selectedShape =
-    selectedId === null ? null : shapes.find((s) => s.id === selectedId) ?? null
+    selectedId === null
+      ? null
+      : (shapes.find((s) => s.id === selectedId) ?? null)
   const editingSelected = selectedShape !== null
 
   const displayOutlineColor = editingSelected
@@ -220,9 +224,7 @@ export function SpotlightControls({
   const outlineWidthMax = 32
 
   const outlineActive =
-    selectedShape !== null
-      ? !!selectedShape.outline
-      : attachOutlineToNewShapes
+    selectedShape !== null ? !!selectedShape.outline : attachOutlineToNewShapes
 
   const handleOutlineSwitch = (on: boolean) => {
     if (selectedShape !== null) {
@@ -261,9 +263,7 @@ export function SpotlightControls({
   }
 
   const fillActive =
-    selectedShape !== null
-      ? !!selectedShape.fill
-      : attachFillToNewShapes
+    selectedShape !== null ? !!selectedShape.fill : attachFillToNewShapes
 
   const handleFillSwitch = (on: boolean) => {
     if (selectedShape !== null) {
@@ -276,8 +276,14 @@ export function SpotlightControls({
 
   const showShapeStyleControls = shapes.length > 0 || selectedId !== null
   const canEditMagnifier = magnifier !== null
-  const sourceOutline = magnifier?.sourceOutline ?? { color: '#2563eb', widthPx: 3 }
-  const insetOutline = magnifier?.insetOutline ?? { color: '#2563eb', widthPx: 3 }
+  const sourceOutline = magnifier?.sourceOutline ?? {
+    color: '#2563eb',
+    widthPx: 3,
+  }
+  const insetOutline = magnifier?.insetOutline ?? {
+    color: '#2563eb',
+    widthPx: 3,
+  }
   const connector = magnifier?.connector ?? {
     enabled: true,
     color: '#2563eb',
@@ -307,105 +313,111 @@ export function SpotlightControls({
           {
             value: 'magnifier',
             label: 'Inset',
-            icon: <PictureInPicture className="size-3.5 shrink-0" aria-hidden />,
+            icon: (
+              <PictureInPicture className="size-3.5 shrink-0" aria-hidden />
+            ),
           },
         ]}
       />
 
       {showShapeStyleControls && (
-      <>
-      <div className="mb-6 flex flex-col gap-3">
-        <Label className="text-sm font-medium">Shape outline</Label>
-        <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
-          <Switch
-            id="spotlight-outline-toggle"
-            checked={outlineActive}
-            onCheckedChange={handleOutlineSwitch}
-            className="shrink-0"
-            aria-label={
-              editingSelected
-                ? 'Show outline on this shape'
-                : 'Add outline to new shapes'
-            }
-          />
-          <OutlineColorSwatchPopover
-            id="spotlight-outline"
-            value={displayOutlineColor}
-            onChange={setOutlineColor}
-            swatchAriaLabel="Choose outline color"
-            disabled={!outlineActive}
-          />
-          <SteppedNumberInput
-            value={displayOutlineWidth}
-            onChange={setOutlineWidth}
-            min={outlineWidthMin}
-            max={outlineWidthMax}
-            step={1}
-            aria-label="Outline width in pixels"
-            disabled={!outlineActive}
-            className="w-[min(100%,10rem)] shrink-0"
-          />
-          <span
-            className={cn(
-              'shrink-0 text-xs tabular-nums',
-              outlineActive
-                ? 'text-muted-foreground'
-                : 'text-muted-foreground/60',
-            )}
-          >
-            px
-          </span>
-        </div>
-      </div>
+        <>
+          <div className="mb-6 flex flex-col gap-3">
+            <Label className="text-sm font-medium">Shape outline</Label>
+            <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
+              <Switch
+                id="spotlight-outline-toggle"
+                checked={outlineActive}
+                onCheckedChange={handleOutlineSwitch}
+                className="shrink-0"
+                aria-label={
+                  editingSelected
+                    ? 'Show outline on this shape'
+                    : 'Add outline to new shapes'
+                }
+              />
+              <OutlineColorSwatchPopover
+                id="spotlight-outline"
+                value={displayOutlineColor}
+                onChange={setOutlineColor}
+                swatchAriaLabel="Choose outline color"
+                disabled={!outlineActive}
+              />
+              <SteppedNumberInput
+                value={displayOutlineWidth}
+                onChange={setOutlineWidth}
+                min={outlineWidthMin}
+                max={outlineWidthMax}
+                step={1}
+                aria-label="Outline width in pixels"
+                disabled={!outlineActive}
+                className="w-[min(100%,10rem)] shrink-0"
+              />
+              <span
+                className={cn(
+                  'shrink-0 text-xs tabular-nums',
+                  outlineActive
+                    ? 'text-muted-foreground'
+                    : 'text-muted-foreground/60',
+                )}
+              >
+                px
+              </span>
+            </div>
+          </div>
 
-      <div className="mb-6 flex flex-col gap-3">
-        <Label className="text-sm font-medium">Shape fill</Label>
-        <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
-          <Switch
-            id="spotlight-fill-toggle"
-            checked={fillActive}
-            onCheckedChange={handleFillSwitch}
-            className="shrink-0"
-            aria-label={
-              editingSelected
-                ? 'Show fill on this shape'
-                : 'Add fill to new shapes'
-            }
-          />
-          <OutlineColorSwatchPopover
-            id="spotlight-fill"
-            value={displayFillColor}
-            onChange={setFillColor}
-            swatchAriaLabel="Choose fill color"
-            disabled={!fillActive}
-          />
-          <SteppedNumberInput
-            value={displayFillOpacity}
-            onChange={setFillOpacity}
-            min={0}
-            max={100}
-            step={1}
-            aria-label="Fill opacity percent"
-            disabled={!fillActive}
-            className="w-[min(100%,10rem)] shrink-0"
-          />
-          <span
-            className={cn(
-              'shrink-0 text-xs tabular-nums',
-              fillActive ? 'text-muted-foreground' : 'text-muted-foreground/60',
-            )}
-          >
-            %
-          </span>
-        </div>
-      </div>
-      </>
+          <div className="mb-6 flex flex-col gap-3">
+            <Label className="text-sm font-medium">Shape fill</Label>
+            <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
+              <Switch
+                id="spotlight-fill-toggle"
+                checked={fillActive}
+                onCheckedChange={handleFillSwitch}
+                className="shrink-0"
+                aria-label={
+                  editingSelected
+                    ? 'Show fill on this shape'
+                    : 'Add fill to new shapes'
+                }
+              />
+              <OutlineColorSwatchPopover
+                id="spotlight-fill"
+                value={displayFillColor}
+                onChange={setFillColor}
+                swatchAriaLabel="Choose fill color"
+                disabled={!fillActive}
+              />
+              <SteppedNumberInput
+                value={displayFillOpacity}
+                onChange={setFillOpacity}
+                min={0}
+                max={100}
+                step={1}
+                aria-label="Fill opacity percent"
+                disabled={!fillActive}
+                className="w-[min(100%,10rem)] shrink-0"
+              />
+              <span
+                className={cn(
+                  'shrink-0 text-xs tabular-nums',
+                  fillActive
+                    ? 'text-muted-foreground'
+                    : 'text-muted-foreground/60',
+                )}
+              >
+                %
+              </span>
+            </div>
+          </div>
+        </>
       )}
 
       {canEditMagnifier && (
         <>
           <div className="mb-6 flex flex-col gap-3">
-            <Label className="text-sm font-medium">Magnifier — source outline</Label>
+            <Label className="text-sm font-medium">
+              Magnifier — source outline
+            </Label>
             <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
               <OutlineColorSwatchPopover
                 id="spotlight-mag-source-outline"
@@ -427,7 +439,9 @@ export function SpotlightControls({
               <span
                 className={cn(
                   'shrink-0 text-xs tabular-nums',
-                  canEditMagnifier ? 'text-muted-foreground' : 'text-muted-foreground/60',
+                  canEditMagnifier
+                    ? 'text-muted-foreground'
+                    : 'text-muted-foreground/60',
                 )}
               >
                 px
@@ -439,7 +453,9 @@ export function SpotlightControls({
           </div>
 
           <div className="mb-6 flex flex-col gap-3">
-            <Label className="text-sm font-medium">Magnifier — inset outline</Label>
+            <Label className="text-sm font-medium">
+              Magnifier — inset outline
+            </Label>
             <div className="flex h-8 min-h-8 max-w-full items-center gap-2">
               <OutlineColorSwatchPopover
                 id="spotlight-mag-inset-outline"
@@ -461,7 +477,9 @@ export function SpotlightControls({
               <span
                 className={cn(
                   'shrink-0 text-xs tabular-nums',
-                  canEditMagnifier ? 'text-muted-foreground' : 'text-muted-foreground/60',
+                  canEditMagnifier
+                    ? 'text-muted-foreground'
+                    : 'text-muted-foreground/60',
                 )}
               >
                 px
@@ -605,7 +623,9 @@ export function SpotlightControls({
         <Label className="text-sm font-medium">Output format</Label>
         <RadioGroup
           value={outputFormat}
-          onValueChange={(v) => onOutputFormatChange(v as SpotlightOutputFormat)}
+          onValueChange={(v) =>
+            onOutputFormatChange(v as SpotlightOutputFormat)
+          }
           className="inline-flex w-full flex-wrap items-center gap-0.5 rounded-md border border-input bg-background p-0.5 shadow-sm"
           aria-label="Export format"
         >
@@ -647,7 +667,8 @@ export function SpotlightControls({
       <div className="mb-2 border-t border-border pt-6">
         <Label className="text-sm font-medium">Animation export</Label>
         <p className="mt-1 text-sm text-muted-foreground">
-          Export a clip that fades from the full image into the spotlight effect.
+          Export a clip that fades from the full image into the spotlight
+          effect.
         </p>
       </div>
 
@@ -663,7 +684,9 @@ export function SpotlightControls({
 
       <div className="mb-6 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
-          <Label className="text-sm font-medium shrink-0">Transition duration</Label>
+          <Label className="text-sm font-medium shrink-0">
+            Transition duration
+          </Label>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <SteppedNumberInput
               value={transitionDurationSec}
@@ -749,7 +772,8 @@ export function SpotlightControls({
         </span>
         {animationFormat === 'mp4' && (
           <span className="text-xs text-muted-foreground">
-            MP4 is used when supported; otherwise the download falls back to WebM.
+            MP4 is used when supported; otherwise the download falls back to
+            WebM.
           </span>
         )}
       </div>

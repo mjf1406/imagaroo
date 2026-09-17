@@ -103,9 +103,7 @@ function PosterPage() {
       primaryAxis,
       sheetsWide: layout?.sheetsWide ?? sheetsWide,
       sheetsTall: layout?.sheetsTall ?? sheetsTall,
-      offsetMm: layout
-        ? clampOffsetMm(offsetMm, layout.slackMm)
-        : offsetMm,
+      offsetMm: layout ? clampOffsetMm(offsetMm, layout.slackMm) : offsetMm,
       showCropMarks,
       showPageCoords,
     }),

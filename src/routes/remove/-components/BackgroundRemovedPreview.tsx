@@ -2,14 +2,19 @@ import { useEffect, useRef, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useDebouncer } from '@tanstack/react-pacer'
 import type { ImageFile } from '@/components/ImagePreview'
+import type {
+  BackgroundRemovalModelId,
+  BackgroundRemovalProgress,
+} from '@/lib/background-removal'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { removeBg } from '@/lib/image-remove-bg'
 import { autoCropImage } from '@/lib/image-cropper'
+import { formatProgress } from '@/lib/background-removal'
 
 interface BackgroundRemovedPreviewProps {
   image: ImageFile | null
   outputFormat: 'png' | 'webp'
-  tolerance: number
+  modelId: BackgroundRemovalModelId
   crop?: boolean
   remove?: boolean
 }
@@ -17,7 +22,7 @@ interface BackgroundRemovedPreviewProps {
 export function BackgroundRemovedPreview({
   image,
   outputFormat,
-  tolerance,
+  modelId,
   crop = true,
   remove = true,
 }: BackgroundRemovedPreviewProps) {
@@ -28,52 +33,62 @@ export function BackgroundRemovedPreview({
     null,
   )
   const [isLoading, setIsLoading] = useState(false)
+  const [progress, setProgress] = useState<BackgroundRemovalProgress | null>(
+    null,
+  )
   const cancelledRef = useRef<{ cancelled: boolean } | null>(null)
 
   const debouncer = useDebouncer(
     async (params: {
       image: ImageFile
       outputFormat: 'png' | 'webp'
-      tolerance: number
+      modelId: BackgroundRemovalModelId
       crop: boolean
       remove: boolean
     }) => {
       const currentOperation = { cancelled: false }
       cancelledRef.current = currentOperation
+      const abortController = new AbortController()
       setIsLoading(true)
+      setProgress(null)
 
       try {
         let bgRemovedBlob: Blob | null = null
         let croppedBlob: Blob | null = null
 
-        // Remove background if selected
         if (params.remove) {
           bgRemovedBlob = await removeBg(
             params.image.file,
             params.outputFormat,
-            params.tolerance,
+            {
+              modelId: params.modelId,
+              signal: abortController.signal,
+              onProgress: (nextProgress) => {
+                if (!currentOperation.cancelled) {
+                  setProgress(nextProgress)
+                }
+              },
+            },
           )
 
           if (currentOperation.cancelled) {
+            abortController.abort()
             return
           }
         }
 
-        // Crop if selected - always crop the original image for independent preview
         if (params.crop) {
           croppedBlob = await autoCropImage(
             params.image.file,
             params.outputFormat,
           )
 
-          // Check cancellation again after async operation
-          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
           if (currentOperation.cancelled) {
+            abortController.abort()
             return
           }
         }
 
-        // Set background removed preview if available
         if (bgRemovedBlob) {
           const bgRemovedUrl = URL.createObjectURL(bgRemovedBlob)
           setBgRemovedPreviewUrl((prev) => {
@@ -86,7 +101,6 @@ export function BackgroundRemovedPreview({
           setBgRemovedPreviewUrl(null)
         }
 
-        // Set cropped preview if available
         if (croppedBlob) {
           const croppedUrl = URL.createObjectURL(croppedBlob)
           setCroppedPreviewUrl((prev) => {
@@ -100,11 +114,17 @@ export function BackgroundRemovedPreview({
         }
 
         setIsLoading(false)
-      } catch (error) {
-        console.error('Preview generation error:', error)
-        if (!currentOperation.cancelled) {
-          setIsLoading(false)
+        setProgress(null)
+      } catch (caught) {
+        if (currentOperation.cancelled) {
+          return
         }
+        if (caught instanceof DOMException && caught.name === 'AbortError') {
+          return
+        }
+        console.error('Preview generation error:', caught)
+        setIsLoading(false)
+        setProgress(null)
       }
     },
     { wait: 300 },
@@ -115,22 +135,21 @@ export function BackgroundRemovedPreview({
       setBgRemovedPreviewUrl(null)
       setCroppedPreviewUrl(null)
       setIsLoading(false)
-      debouncer.cancel() // Cancel any pending debounced execution
+      setProgress(null)
+      debouncer.cancel()
       if (cancelledRef.current) {
         cancelledRef.current.cancelled = true
       }
       return
     }
 
-    // Cancel previous operation and any pending debounced execution
     debouncer.cancel()
     if (cancelledRef.current) {
       cancelledRef.current.cancelled = true
     }
-    debouncer.maybeExecute({ image, outputFormat, tolerance, crop, remove })
-  }, [image, outputFormat, tolerance, crop, remove, debouncer])
+    debouncer.maybeExecute({ image, outputFormat, modelId, crop, remove })
+  }, [image, outputFormat, modelId, crop, remove, debouncer])
 
-  // Cleanup on unmount or when preview URLs change
   useEffect(() => {
     return () => {
       if (bgRemovedPreviewUrl) {
@@ -142,7 +161,6 @@ export function BackgroundRemovedPreview({
     }
   }, [bgRemovedPreviewUrl, croppedPreviewUrl])
 
-  // Cleanup debouncer on unmount
   useEffect(() => {
     return () => {
       debouncer.cancel()
@@ -188,7 +206,10 @@ export function BackgroundRemovedPreview({
       <CardHeader>
         <CardTitle className="text-lg">Preview</CardTitle>
         <p className="text-sm text-muted-foreground">
-          {getPreviewDescription().replace('{image.file.name}', image.file.name)}
+          {getPreviewDescription().replace(
+            '{image.file.name}',
+            image.file.name,
+          )}
         </p>
       </CardHeader>
       <CardContent>
@@ -204,8 +225,13 @@ export function BackgroundRemovedPreview({
               </p>
               <div className="relative aspect-square overflow-hidden rounded-md bg-muted border-2 border-dashed border-border">
                 {isLoading ? (
-                  <div className="flex items-center justify-center h-full">
+                  <div className="flex h-full flex-col items-center justify-center gap-2 px-3 text-center">
                     <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                    {progress && (
+                      <p className="text-xs text-muted-foreground">
+                        {formatProgress(progress)}
+                      </p>
+                    )}
                   </div>
                 ) : preview.url ? (
                   <img

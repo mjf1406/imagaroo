@@ -4,8 +4,8 @@
  * Optional magnifier frame adds an inset zoom; its source rect joins the focus mask.
  */
 
-import type { MagnifierFrame, MagnifierRect } from './image-magnifier'
 import { drawMagnifierOverlay, magnifierExtent } from './image-magnifier'
+import type { MagnifierFrame, MagnifierRect } from './image-magnifier'
 
 export type SpotlightShapeKind = 'rect' | 'ellipse'
 
@@ -82,7 +82,9 @@ function parseHexRgb(hex: string): { r: number; g: number; b: number } | null {
 }
 
 /** CSS `rgba(...)` for canvas/SVG from stored fill. */
-export function spotlightFillToRgbaString(fill: SpotlightShapeFillStyle): string {
+export function spotlightFillToRgbaString(
+  fill: SpotlightShapeFillStyle,
+): string {
   const rgb = parseHexRgb(fill.color)
   const a = clamp(fill.opacityPct, 0, 100) / 100
   if (!rgb) return `rgba(0,0,0,${a})`
@@ -149,9 +151,7 @@ function buildEffectAlphaMask(
   if (!m) return mask
 
   const hasMagSrc =
-    magnifierSource !== null &&
-    magnifierSource.w > 0 &&
-    magnifierSource.h > 0
+    magnifierSource !== null && magnifierSource.w > 0 && magnifierSource.h > 0
   if (shapes.length === 0 && !hasMagSrc) {
     return mask
   }

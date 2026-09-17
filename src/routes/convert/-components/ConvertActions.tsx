@@ -1,12 +1,17 @@
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import type { ImageFile } from '@/components/ImagePreview'
-import { convertImage, changeFileExtension, hasTransparency, getFileExtension } from '@/lib/image-converter'
+import { Button } from '@/components/ui/button'
+import {
+  changeFileExtension,
+  convertImage,
+  getFileExtension,
+  hasTransparency,
+} from '@/lib/image-converter'
 import { createZip, downloadBlob } from '@/lib/zip-utils'
 
 interface ConvertActionsProps {
-  images: ImageFile[]
+  images: Array<ImageFile>
   globalFormat: string
   backgroundColor?: string
   onClear: () => void
@@ -31,10 +36,13 @@ export function ConvertActions({
       for (const image of images) {
         const targetFormat = image.outputFormat ?? globalFormat
         const formatLower = targetFormat.toLowerCase()
-        
+
         // Determine if we need to use background color
         let bgColor: string | undefined
-        if (backgroundColor && (formatLower === 'jpg' || formatLower === 'jpeg')) {
+        if (
+          backgroundColor &&
+          (formatLower === 'jpg' || formatLower === 'jpeg')
+        ) {
           // Check if image has transparency and is from WebP/PNG
           const originalExt = getFileExtension(image.file.name).toLowerCase()
           if (originalExt === 'webp' || originalExt === 'png') {
@@ -50,7 +58,7 @@ export function ConvertActions({
             }
           }
         }
-        
+
         const blob = await convertImage(image.file, targetFormat, 0.92, bgColor)
         const newFilename = changeFileExtension(
           image.file.name,

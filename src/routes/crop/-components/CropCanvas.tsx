@@ -1,9 +1,17 @@
-import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import type { RefObject } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
 import { Upload } from 'lucide-react'
+import type { RefObject } from 'react'
 
 import type { ImageFile } from '@/components/ImagePreview'
-import { clampCropRectForEditor, type CropRect } from '@/lib/image-cropper'
+import type { CropRect } from '@/lib/image-cropper'
+import { clampCropRectForEditor } from '@/lib/image-cropper'
 import { isValidImageType } from '@/lib/image-converter'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -34,7 +42,12 @@ function isCornerHandle(id: ResizeHandle): boolean {
   return id === 'nw' || id === 'ne' || id === 'se' || id === 'sw'
 }
 
-function normalizeRect(x0: number, y0: number, x1: number, y1: number): CropRect {
+function normalizeRect(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+): CropRect {
   const x = Math.min(x0, x1)
   const y = Math.min(y0, y1)
   const w = Math.abs(x1 - x0)
@@ -396,11 +409,7 @@ function fitLoupeCanvas(spec: EdgeLoupeSpec): {
     }
   }
 
-  const scale = Math.min(
-    LOUPE_ZOOM,
-    maxCanvasW / srcW,
-    maxCanvasH / srcH,
-  )
+  const scale = Math.min(LOUPE_ZOOM, maxCanvasW / srcW, maxCanvasH / srcH)
   return {
     canvasW: Math.round(srcW * scale),
     canvasH: Math.round(srcH * scale),
@@ -782,12 +791,7 @@ export function CropCanvas({
       )
       const clamped = clampRectToImage(resized, iw, ih)
       onRectChange(clamped)
-      updateResizeLoupe(
-        resizeRef.current.handle,
-        clamped,
-        e.clientX,
-        e.clientY,
-      )
+      updateResizeLoupe(resizeRef.current.handle, clamped, e.clientX, e.clientY)
       e.preventDefault()
     }
   }
@@ -1006,7 +1010,9 @@ export function CropCanvas({
     >
       {isDraggingFile && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-primary/10 border-2 border-dashed border-primary pointer-events-none rounded-lg">
-          <p className="text-sm font-medium text-primary">Drop to replace image</p>
+          <p className="text-sm font-medium text-primary">
+            Drop to replace image
+          </p>
         </div>
       )}
       {resizeLoupe && displayRect && (

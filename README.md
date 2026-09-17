@@ -4,7 +4,24 @@
 
 1. [Shadcn Project](https://ui.shadcn.com/create?base=radix&style=lyra&baseColor=stone&theme=lime&iconLibrary=lucide&font=figtree&menuAccent=subtle&menuColor=default&radius=small&item=preview)
 
+## Background removal
+
+Remove Background and Transform run segmentation models entirely in your browser:
+
+- **Standard:** [BRIA RMBG-1.4](https://huggingface.co/briaai/RMBG-1.4). Source-available for non-commercial use. Commercial use needs a [BRIA license](https://bria.ai/bria-huggingface-model-license-agreement/).
+- **Quality:** a browser-ready [BiRefNet](https://github.com/ZhengPeng7/BiRefNet) export (MIT). Shown only when WebGPU and GPU limits look sufficient.
+
+The first run downloads the selected ONNX weights from Hugging Face (about 45 MB for Standard, 115 MB for Quality) and stores them in the browser cache. Inference prefers WebGPU and falls back to quantized WASM. Image bytes are not uploaded.
+
 ## Change Log
+
+### 2026/09/17
+
+- FT: replaced solid-color background removal with on-device ML (RMBG-1.4 Standard, BiRefNet Quality)
+- UX: models run in the browser via Transformers.js, prefer WebGPU, and fall back to WASM
+- UX: Quality is offered only when this device has WebGPU and enough GPU capacity
+- UX: first run downloads the selected model from Hugging Face and caches it locally
+- UX: images stay on the device; RMBG-1.4 is non-commercial unless you have a BRIA license
 
 ### 2026/06/06
 

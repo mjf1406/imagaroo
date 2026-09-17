@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import type { ImageFile } from '@/components/ImagePreview'
+import { Button } from '@/components/ui/button'
 import { reduceImage } from '@/lib/image-reducer'
 import { changeFileExtension } from '@/lib/image-converter'
 import { createZip, downloadBlob } from '@/lib/zip-utils'
 
 interface ReduceActionsProps {
-  images: ImageFile[]
+  images: Array<ImageFile>
   outputFormat: 'png' | 'webp'
   reduceWidth: number | null
   reduceHeight: number | null
@@ -27,7 +27,12 @@ export function ReduceActions({
     if (images.length === 0) return
 
     // Validate dimensions
-    if (reduceWidth === null || reduceHeight === null || reduceWidth < 1 || reduceHeight < 1) {
+    if (
+      reduceWidth === null ||
+      reduceHeight === null ||
+      reduceWidth < 1 ||
+      reduceHeight < 1
+    ) {
       alert('Please set valid width and height for reduction.')
       return
     }

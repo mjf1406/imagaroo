@@ -78,9 +78,14 @@ export function resizeCropRectCentered(
 ): CropRect {
   const w = Math.max(minSize, Math.min(newW, imageWidth))
   const h = Math.max(minSize, Math.min(newH, imageHeight))
-  let x = rect.x + (rect.w - w) / 2
-  let y = rect.y + (rect.h - h) / 2
-  return clampCropRectForEditor({ x, y, w, h }, imageWidth, imageHeight, minSize)
+  const x = rect.x + (rect.w - w) / 2
+  const y = rect.y + (rect.h - h) / 2
+  return clampCropRectForEditor(
+    { x, y, w, h },
+    imageWidth,
+    imageHeight,
+    minSize,
+  )
 }
 
 export async function cropImageToRect(
@@ -110,7 +115,12 @@ export async function cropImageToRect(
         }
 
         if (outputFormat === 'jpg') {
-          fillJpgBackground(croppedCtx, cropWidth, cropHeight, jpgBackgroundColor)
+          fillJpgBackground(
+            croppedCtx,
+            cropWidth,
+            cropHeight,
+            jpgBackgroundColor,
+          )
         }
 
         croppedCtx.drawImage(
@@ -211,7 +221,9 @@ export async function autoCropImage(
               jpgBackgroundColor,
             )
             exportCtx.drawImage(canvas, 0, 0)
-            blobFromCanvas(exportCanvas, outputFormat).then(resolve).catch(reject)
+            blobFromCanvas(exportCanvas, outputFormat)
+              .then(resolve)
+              .catch(reject)
           } else {
             blobFromCanvas(canvas, outputFormat).then(resolve).catch(reject)
           }

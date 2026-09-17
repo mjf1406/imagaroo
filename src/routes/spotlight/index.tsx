@@ -3,14 +3,17 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { SpotlightActions } from './-components/SpotlightActions'
 import { SpotlightCanvas } from './-components/SpotlightCanvas'
+import { SpotlightControls } from './-components/SpotlightControls'
+import { SpotlightPageHeader } from './-components/SpotlightPageHeader'
 import type {
   SpotlightInteractionPayload,
   SpotlightSelection,
   SpotlightTool,
 } from './-components/SpotlightCanvas'
-import { SpotlightControls } from './-components/SpotlightControls'
-import { SpotlightPageHeader } from './-components/SpotlightPageHeader'
-import type { SpotlightOutputFormat, SpotlightAnimationFormat } from './-components/SpotlightControls'
+import type {
+  SpotlightAnimationFormat,
+  SpotlightOutputFormat,
+} from './-components/SpotlightControls'
 
 import type { ImageFile } from '@/components/ImagePreview'
 import type { MagnifierFrame } from '@/lib/image-magnifier'
@@ -78,8 +81,7 @@ function SpotlightImagePage() {
   const [defaultFillColor, setDefaultFillColor] = useState('#2563eb')
   const [defaultFillOpacityPct, setDefaultFillOpacityPct] = useState(30)
 
-  const selectedShapeId =
-    selection?.kind === 'shape' ? selection.id : null
+  const selectedShapeId = selection?.kind === 'shape' ? selection.id : null
 
   const addOutlineToShape = useCallback(
     (shapeId: string) => {
@@ -102,9 +104,7 @@ function SpotlightImagePage() {
 
   const removeOutlineFromShape = useCallback((shapeId: string) => {
     setShapes((prev) =>
-      prev.map((s) =>
-        s.id === shapeId ? { ...s, outline: undefined } : s,
-      ),
+      prev.map((s) => (s.id === shapeId ? { ...s, outline: undefined } : s)),
     )
   }, [])
 
@@ -234,14 +234,17 @@ function SpotlightImagePage() {
     }
   }, [shapes, magnifier])
 
-  const onInteractionEnd = useCallback((payload: SpotlightInteractionPayload) => {
-    const before = pendingHistoryRef.current
-    pendingHistoryRef.current = null
-    if (before === null) return
-    if (!snapshotsEqual(before, payload)) {
-      setPast((p) => [...p, before])
-    }
-  }, [])
+  const onInteractionEnd = useCallback(
+    (payload: SpotlightInteractionPayload) => {
+      const before = pendingHistoryRef.current
+      pendingHistoryRef.current = null
+      if (before === null) return
+      if (!snapshotsEqual(before, payload)) {
+        setPast((p) => [...p, before])
+      }
+    },
+    [],
+  )
 
   const handleImageFromFile = useCallback((file: File) => {
     const id = `${Date.now()}-${Math.random()}`
@@ -265,7 +268,10 @@ function SpotlightImagePage() {
   const handleClearMagnifier = useCallback(() => {
     setPast((p) => [
       ...p,
-      { shapes: structuredClone(shapes), magnifier: structuredClone(magnifier) },
+      {
+        shapes: structuredClone(shapes),
+        magnifier: structuredClone(magnifier),
+      },
     ])
     setMagnifier(null)
     setSelection((s) => (s?.kind === 'magnifier' ? null : s))

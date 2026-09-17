@@ -144,11 +144,7 @@ export function optimumSheetsForPrintDpi(
 ): { sheetsWide: number; sheetsTall: number; primaryAxis: PrimaryAxis } {
   const targetPosterWmm = (imageWidthPx / OPTIMUM_DPI) * MM_PER_IN
   const { printableW } = computePrintableDims(paperSize, orientation, marginMm)
-  const overlap = clamp(
-    overlapMm,
-    0,
-    Math.max(0, printableW - 0.1),
-  )
+  const overlap = clamp(overlapMm, 0, Math.max(0, printableW - 0.1))
   const stepW = Math.max(0.1, printableW - overlap)
 
   let bestSheets = 1
@@ -198,9 +194,7 @@ export function computePosterLayout(
   const stepH = Math.max(0.1, printableH - overlap)
 
   const sheets = computeSheetsForAxis(
-    settings.primaryAxis === 'wide'
-      ? settings.sheetsWide
-      : settings.sheetsTall,
+    settings.primaryAxis === 'wide' ? settings.sheetsWide : settings.sheetsTall,
     settings.primaryAxis,
     imageWidthPx,
     imageHeightPx,
@@ -244,10 +238,7 @@ export function computePosterLayout(
   }
 }
 
-export function clampOffsetMm(
-  offsetMm: number,
-  slackMm: number,
-): number {
+export function clampOffsetMm(offsetMm: number, slackMm: number): number {
   return clamp(offsetMm, 0, slackMm)
 }
 
@@ -328,10 +319,8 @@ function renderPageSlice(
   ctx.fillRect(0, 0, canvasW, canvasH)
 
   const img = layout.imageRect
-  const srcX =
-    ((intersect.x - img.x) / img.w) * image.naturalWidth
-  const srcY =
-    ((intersect.y - img.y) / img.h) * image.naturalHeight
+  const srcX = ((intersect.x - img.x) / img.w) * image.naturalWidth
+  const srcY = ((intersect.y - img.y) / img.h) * image.naturalHeight
   const srcW = (intersect.w / img.w) * image.naturalWidth
   const srcH = (intersect.h / img.h) * image.naturalHeight
 
@@ -340,17 +329,7 @@ function renderPageSlice(
   const destW = (intersect.w / layout.printableW) * canvasW
   const destH = (intersect.h / layout.printableH) * canvasH
 
-  ctx.drawImage(
-    image,
-    srcX,
-    srcY,
-    srcW,
-    srcH,
-    destX,
-    destY,
-    destW,
-    destH,
-  )
+  ctx.drawImage(image, srcX, srcY, srcW, srcH, destX, destY, destW, destH)
 
   return canvas.toDataURL('image/jpeg', 0.92)
 }
@@ -407,11 +386,7 @@ export async function generatePosterPdf(
       if (settings.showPageCoords) {
         doc.setFontSize(8)
         doc.setTextColor(80)
-        doc.text(
-          `C${col + 1}-R${row + 1}`,
-          margin,
-          margin - 2,
-        )
+        doc.text(`C${col + 1}-R${row + 1}`, margin, margin - 2)
       }
 
       pageIndex++

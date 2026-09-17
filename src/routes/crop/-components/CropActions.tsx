@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import type { ImageFile } from '@/components/ImagePreview'
-import { autoCropImage, type CropOutputFormat } from '@/lib/image-cropper'
+import type { CropOutputFormat } from '@/lib/image-cropper'
+import { Button } from '@/components/ui/button'
+import { autoCropImage } from '@/lib/image-cropper'
 import { changeFileExtension } from '@/lib/image-converter'
 import { createZip, downloadBlob } from '@/lib/zip-utils'
 
 interface CropActionsProps {
-  images: ImageFile[]
+  images: Array<ImageFile>
   outputFormat: CropOutputFormat
   jpgBackgroundColor: string
   onClear: () => void

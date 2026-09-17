@@ -91,7 +91,10 @@ export function magnifierExtent(
   }
 }
 
-function drawConnectors(ctx: CanvasRenderingContext2D, frame: MagnifierFrame): void {
+function drawConnectors(
+  ctx: CanvasRenderingContext2D,
+  frame: MagnifierFrame,
+): void {
   if (!frame.connector.enabled) return
   const segs = computeConnectorSegments(frame)
   if (segs.length === 0) return
@@ -169,4 +172,3 @@ export function drawMagnifierOverlay(
   strokeRect(ctx, frame.inset, frame.insetOutline)
   ctx.restore()
 }
-

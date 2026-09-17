@@ -5,8 +5,10 @@ import { ImagePreviewGrid } from '../convert/-components/ImagePreviewGrid'
 import { RemoveImagePageHeader } from './-components/RemoveImagePageHeader'
 import { RemoveActions } from './-components/RemoveActions'
 import { OutputFormatSelector } from './-components/OutputFormatSelector'
-import { ToleranceSlider } from './-components/ToleranceSlider'
 import { BackgroundRemovedPreview } from './-components/BackgroundRemovedPreview'
+import { ModelSelector } from './-components/ModelSelector'
+import { BackgroundRemovalAttribution } from './-components/BackgroundRemovalAttribution'
+import { useBackgroundRemovalSession } from './-components/useBackgroundRemovalSession'
 import type { ImageFile } from '@/components/ImagePreview'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg', 'avif', 'ico']
@@ -18,7 +20,7 @@ export const Route = createFileRoute('/remove/')({
 function RemoveImagePage() {
   const [images, setImages] = useState<Array<ImageFile>>([])
   const [outputFormat, setOutputFormat] = useState<'png' | 'webp'>('webp')
-  const [tolerance, setTolerance] = useState(30)
+  const session = useBackgroundRemovalSession(images.length > 0)
 
   const handleFilesAdded = (newImages: Array<ImageFile>) => {
     setImages((prev) => [...prev, ...newImages])
@@ -49,46 +51,45 @@ function RemoveImagePage() {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <RemoveImagePageHeader />
-      {/* Flex row layout on md+ screens */}
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Left side: File upload area */}
         <div className="flex-1">
           <FileUploadArea onFilesAdded={handleFilesAdded} />
         </div>
-        {/* Middle: Preview section - shows first image with background removed */}
         {images.length > 0 && (
           <div className="md:w-80 md:shrink-0">
             <BackgroundRemovedPreview
               image={images[0]}
               outputFormat={outputFormat}
-              tolerance={tolerance}
+              modelId={session.modelId}
+              crop={false}
             />
           </div>
         )}
-        {/* Right side: Controls (always visible) */}
         <div className="md:w-80 md:shrink-0">
           <div className="space-y-4">
             <OutputFormatSelector
               value={outputFormat}
               onChange={setOutputFormat}
             />
-            <ToleranceSlider
-              value={tolerance}
-              onChange={setTolerance}
-              min={0}
-              max={100}
-              step={1}
+            <ModelSelector
+              value={session.modelId}
+              onChange={session.setModelId}
+              qualityAvailability={session.qualityAvailability}
+              capabilities={session.capabilities}
+              runtime={session.runtime}
+              progress={session.progress}
+              error={session.error}
             />
             <RemoveActions
               images={images}
               outputFormat={outputFormat}
-              tolerance={tolerance}
+              modelId={session.modelId}
               onClear={handleClear}
             />
+            <BackgroundRemovalAttribution />
           </div>
         </div>
       </div>
-      {/* Image preview grid */}
       {images.length > 0 && (
         <div className="mt-6">
           <ImagePreviewGrid

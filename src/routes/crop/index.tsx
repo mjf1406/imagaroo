@@ -6,12 +6,12 @@ import { CropActions } from './-components/CropActions'
 import { CropCanvas } from './-components/CropCanvas'
 import { CropImagePageHeader } from './-components/CropImagePageHeader'
 import { CropModeToggle } from './-components/CropModeToggle'
-import type { CropMode } from './-components/CropModeToggle'
 import { ManualCropActions } from './-components/ManualCropActions'
 import { ManualCropSizeControls } from './-components/ManualCropSizeControls'
 import { OutputFormatSelector } from './-components/OutputFormatSelector'
+import type { CropMode } from './-components/CropModeToggle'
 import type { ImageFile } from '@/components/ImagePreview'
-import type { CropRect, CropOutputFormat } from '@/lib/image-cropper'
+import type { CropOutputFormat, CropRect } from '@/lib/image-cropper'
 import { fullImageCropRect } from '@/lib/image-cropper'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg', 'avif', 'ico']
@@ -26,10 +26,10 @@ function createImageFile(file: File): ImageFile {
 }
 
 function syncImagesWithManualReplace(
-  images: ImageFile[],
+  images: Array<ImageFile>,
   oldManualId: string | undefined,
   newImage: ImageFile,
-): ImageFile[] {
+): Array<ImageFile> {
   if (images.length === 0) return [newImage]
   if (oldManualId && images[0]?.id === oldManualId) {
     return [newImage, ...images.slice(1)]
@@ -64,9 +64,7 @@ function CropImagePage() {
     }
     const img = new Image()
     img.onload = () => {
-      setCropRect(
-        fullImageCropRect(img.naturalWidth, img.naturalHeight),
-      )
+      setCropRect(fullImageCropRect(img.naturalWidth, img.naturalHeight))
     }
     img.onerror = () => setCropRect(null)
     img.src = manualImage.preview
@@ -96,8 +94,7 @@ function CropImagePage() {
 
   const handleClear = () => {
     const clearedIds = new Set(images.map((image) => image.id))
-    const clearsManual =
-      manualImage !== null && clearedIds.has(manualImage.id)
+    const clearsManual = manualImage !== null && clearedIds.has(manualImage.id)
     images.forEach((image) => {
       URL.revokeObjectURL(image.preview)
     })

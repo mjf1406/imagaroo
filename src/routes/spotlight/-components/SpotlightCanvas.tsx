@@ -9,13 +9,13 @@ import type {
   SpotlightShapeFillStyle,
   SpotlightShapeOutlineStyle,
 } from '@/lib/image-spotlight'
+import type { MagnifierFrame, MagnifierRect } from '@/lib/image-magnifier'
 import {
   clampSpotlightFillOpacityPct,
   clampSpotlightOutlineWidthPx,
   renderSpotlight,
   spotlightFillToRgbaString,
 } from '@/lib/image-spotlight'
-import type { MagnifierFrame, MagnifierRect } from '@/lib/image-magnifier'
 import {
   computeConnectorSegments,
   magnifierExtent,
@@ -32,15 +32,7 @@ export type SpotlightSelection =
   | { kind: 'magnifier'; target: 'source' | 'inset' }
   | null
 
-type ResizeHandle =
-  | 'nw'
-  | 'n'
-  | 'ne'
-  | 'e'
-  | 'se'
-  | 's'
-  | 'sw'
-  | 'w'
+type ResizeHandle = 'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w'
 
 type DraftShape = {
   kind: 'rect' | 'ellipse'
@@ -127,7 +119,11 @@ function applyResizeShape(
   return { ...shape, x, y, w, h }
 }
 
-function clampMagSourceRect(r: MagnifierRect, iw: number, ih: number): MagnifierRect {
+function clampMagSourceRect(
+  r: MagnifierRect,
+  iw: number,
+  ih: number,
+): MagnifierRect {
   let { x, y, w, h } = r
   x = Math.max(0, Math.min(x, iw - MIN_SIZE_MAG))
   y = Math.max(0, Math.min(y, ih - MIN_SIZE_MAG))
@@ -136,7 +132,11 @@ function clampMagSourceRect(r: MagnifierRect, iw: number, ih: number): Magnifier
   return { x, y, w, h }
 }
 
-function clampInsetRect(r: MagnifierRect, iw: number, ih: number): MagnifierRect {
+function clampInsetRect(
+  r: MagnifierRect,
+  iw: number,
+  ih: number,
+): MagnifierRect {
   let { x, y, w, h } = r
   w = Math.max(MIN_SIZE_MAG, Math.min(w, 3 * iw))
   h = Math.max(MIN_SIZE_MAG, Math.min(h, 3 * ih))
@@ -291,7 +291,11 @@ function svgShapeFill(shape: SpotlightShape): string {
   return 'rgba(255,255,255,0.06)'
 }
 
-function clampShapeToImage(s: SpotlightShape, iw: number, ih: number): SpotlightShape {
+function clampShapeToImage(
+  s: SpotlightShape,
+  iw: number,
+  ih: number,
+): SpotlightShape {
   let { x, y, w, h } = s
   x = Math.max(0, Math.min(x, iw - MIN_SIZE_SHAPE))
   y = Math.max(0, Math.min(y, ih - MIN_SIZE_SHAPE))
@@ -673,7 +677,12 @@ export function SpotlightCanvas({
 
     if (draft && drawStartRef.current) {
       const { x, y } = clientToImage(e.clientX, e.clientY)
-      const n = normalizeRect(drawStartRef.current.x, drawStartRef.current.y, x, y)
+      const n = normalizeRect(
+        drawStartRef.current.x,
+        drawStartRef.current.y,
+        x,
+        y,
+      )
       setDraft({ ...draft, ...n })
       e.preventDefault()
       return
@@ -685,7 +694,8 @@ export function SpotlightCanvas({
       const dy = y - magMoveRef.current.pointerStartY
       const startFrame = magMoveRef.current.startFrame
       const target = magMoveRef.current.target
-      const movedRect = target === 'source' ? startFrame.source : startFrame.inset
+      const movedRect =
+        target === 'source' ? startFrame.source : startFrame.inset
 
       const proposed = {
         ...movedRect,
@@ -716,7 +726,12 @@ export function SpotlightCanvas({
       const startFrame = magResizeRef.current.startFrame
       const target = magResizeRef.current.target
       const base = target === 'source' ? startFrame.source : startFrame.inset
-      const proposed = applyResizeMagRect(base, magResizeRef.current.handle, dx, dy)
+      const proposed = applyResizeMagRect(
+        base,
+        magResizeRef.current.handle,
+        dx,
+        dy,
+      )
       const resized =
         target === 'source'
           ? clampMagSourceRect(proposed, iw, ih)
@@ -780,24 +795,22 @@ export function SpotlightCanvas({
       return
     }
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-    const outline =
-      attachOutlineToNewShapes
-        ? {
-            outline: {
-              color: defaultOutlineColor,
-              widthPx: clampSpotlightOutlineWidthPx(defaultOutlineWidthPx),
-            },
-          }
-        : {}
-    const fill =
-      attachFillToNewShapes
-        ? {
-            fill: {
-              color: defaultFillColor,
-              opacityPct: clampSpotlightFillOpacityPct(defaultFillOpacityPct),
-            },
-          }
-        : {}
+    const outline = attachOutlineToNewShapes
+      ? {
+          outline: {
+            color: defaultOutlineColor,
+            widthPx: clampSpotlightOutlineWidthPx(defaultOutlineWidthPx),
+          },
+        }
+      : {}
+    const fill = attachFillToNewShapes
+      ? {
+          fill: {
+            color: defaultFillColor,
+            opacityPct: clampSpotlightFillOpacityPct(defaultFillOpacityPct),
+          },
+        }
+      : {}
     const newShape: SpotlightShape =
       draft.kind === 'rect'
         ? {
@@ -884,10 +897,7 @@ export function SpotlightCanvas({
     }
   }
 
-  const beginMagMove = (
-    e: React.PointerEvent,
-    target: 'source' | 'inset',
-  ) => {
+  const beginMagMove = (e: React.PointerEvent, target: 'source' | 'inset') => {
     const fr = magnifierRef.current
     if (!fr || !loadedImg || iw === 0 || ih === 0) return
     e.stopPropagation()
@@ -1035,7 +1045,8 @@ export function SpotlightCanvas({
         const step = e.shiftKey ? 10 : 1
         const dx =
           e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0
-        const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
+        const dy =
+          e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0
         if (dx === 0 && dy === 0) return
         e.preventDefault()
 
@@ -1209,18 +1220,17 @@ export function SpotlightCanvas({
 
   const selectionRectMag: MagnifierRect | null =
     magSelectionTarget === 'source'
-      ? magnifier?.source ?? null
+      ? (magnifier?.source ?? null)
       : magSelectionTarget === 'inset'
-        ? magnifier?.inset ?? null
+        ? (magnifier?.inset ?? null)
         : null
 
-  const draftSvgFill =
-    attachFillToNewShapes
-      ? spotlightFillToRgbaString({
-          color: defaultFillColor,
-          opacityPct: clampSpotlightFillOpacityPct(defaultFillOpacityPct),
-        })
-      : 'rgba(34,197,94,0.15)'
+  const draftSvgFill = attachFillToNewShapes
+    ? spotlightFillToRgbaString({
+        color: defaultFillColor,
+        opacityPct: clampSpotlightFillOpacityPct(defaultFillOpacityPct),
+      })
+    : 'rgba(34,197,94,0.15)'
 
   const magHandleSize = Math.max(10, Math.min(16, iw > 0 ? iw * 0.02 : 12))
   const hr = magHandleSize / 2
@@ -1244,7 +1254,9 @@ export function SpotlightCanvas({
     >
       {isDraggingFile && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-primary/10 border-2 border-dashed border-primary pointer-events-none rounded-lg">
-          <p className="text-sm font-medium text-primary">Drop to replace image</p>
+          <p className="text-sm font-medium text-primary">
+            Drop to replace image
+          </p>
         </div>
       )}
       <div className="relative mx-auto flex w-full max-w-full justify-center">
@@ -1278,25 +1290,25 @@ export function SpotlightCanvas({
               {previewMag &&
                 previewMag.connector.enabled &&
                 connectorSegs.length > 0 && (
-                <defs>
-                  <mask id={connectorMaskId}>
-                    <rect
-                      x={-ext.offsetX}
-                      y={-ext.offsetY}
-                      width={ext.canvasW}
-                      height={ext.canvasH}
-                      fill="white"
-                    />
-                    <rect
-                      x={previewMag.inset.x}
-                      y={previewMag.inset.y}
-                      width={previewMag.inset.w}
-                      height={previewMag.inset.h}
-                      fill="black"
-                    />
-                  </mask>
-                </defs>
-              )}
+                  <defs>
+                    <mask id={connectorMaskId}>
+                      <rect
+                        x={-ext.offsetX}
+                        y={-ext.offsetY}
+                        width={ext.canvasW}
+                        height={ext.canvasH}
+                        fill="white"
+                      />
+                      <rect
+                        x={previewMag.inset.x}
+                        y={previewMag.inset.y}
+                        width={previewMag.inset.w}
+                        height={previewMag.inset.h}
+                        fill="black"
+                      />
+                    </mask>
+                  </defs>
+                )}
 
               {previewMag && previewMag.id !== '__draft__' && (
                 <>
@@ -1454,7 +1466,11 @@ export function SpotlightCanvas({
               {selected &&
                 (() => {
                   const { x, y, w, h } = selected
-                  const handles: Array<{ id: ResizeHandle; cx: number; cy: number }> = [
+                  const handles: Array<{
+                    id: ResizeHandle
+                    cx: number
+                    cy: number
+                  }> = [
                     { id: 'nw', cx: x, cy: y },
                     { id: 'n', cx: x + w / 2, cy: y },
                     { id: 'ne', cx: x + w, cy: y },
@@ -1555,11 +1571,7 @@ export function SpotlightCanvas({
                       vectorEffect="non-scaling-stroke"
                       style={{ cursor: `${hi.id}-resize` }}
                       onPointerDown={(e) =>
-                        beginMagResize(
-                          e,
-                          magSelectionTarget ?? 'source',
-                          hi.id,
-                        )
+                        beginMagResize(e, magSelectionTarget ?? 'source', hi.id)
                       }
                     />
                   )

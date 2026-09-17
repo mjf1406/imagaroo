@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
+import type { ImageFile } from '@/components/ImagePreview'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import type { ImageFile } from '@/components/ImagePreview'
 import { isValidImageType } from '@/lib/image-converter'
 
 interface FileUploadAreaProps {
-  onFilesAdded: (files: ImageFile[]) => void
+  onFilesAdded: (files: Array<ImageFile>) => void
 }
 
 export function FileUploadArea({ onFilesAdded }: FileUploadAreaProps) {
@@ -16,7 +16,7 @@ export function FileUploadArea({ onFilesAdded }: FileUploadAreaProps) {
   const handleFiles = (files: FileList | null) => {
     if (!files) return
 
-    const imageFiles: ImageFile[] = []
+    const imageFiles: Array<ImageFile> = []
     const validFiles = Array.from(files).filter(isValidImageType)
 
     validFiles.forEach((file) => {

@@ -7,11 +7,7 @@ import type {
   PosterLayout,
   PrimaryAxis,
 } from '@/lib/image-poster'
-import {
-  PAPER_SIZES_MM,
-  displayToMm,
-  mmToDisplay,
-} from '@/lib/image-poster'
+import { PAPER_SIZES_MM, displayToMm, mmToDisplay } from '@/lib/image-poster'
 import { SteppedNumberInput } from '@/components/SteppedNumberInput'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -71,7 +67,9 @@ function UnitToggle({
         type="button"
         className={cn(
           'px-2 py-1 transition-colors',
-          unit === 'mm' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
+          unit === 'mm'
+            ? 'bg-primary text-primary-foreground'
+            : 'hover:bg-muted',
         )}
         onClick={() => onUnitChange('mm')}
       >
@@ -81,7 +79,9 @@ function UnitToggle({
         type="button"
         className={cn(
           'px-2 py-1 transition-colors',
-          unit === 'in' ? 'bg-primary text-primary-foreground' : 'hover:bg-muted',
+          unit === 'in'
+            ? 'bg-primary text-primary-foreground'
+            : 'hover:bg-muted',
         )}
         onClick={() => onUnitChange('in')}
       >
@@ -282,8 +282,9 @@ export function PosterControls({
 
         {layout && hasImage && (
           <p className="text-xs text-muted-foreground">
-            Poster size: {layout.posterW.toFixed(0)} × {layout.posterH.toFixed(0)}{' '}
-            mm ({layout.sheetsWide}×{layout.sheetsTall} pages)
+            Poster size: {layout.posterW.toFixed(0)} ×{' '}
+            {layout.posterH.toFixed(0)} mm ({layout.sheetsWide}×
+            {layout.sheetsTall} pages)
           </p>
         )}
 

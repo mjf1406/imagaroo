@@ -5,8 +5,8 @@
 import { GIFEncoder, applyPalette, quantize } from 'gifenc'
 
 import { magnifierExtent } from './image-magnifier'
-import type { SpotlightRenderOptions } from './image-spotlight'
 import { renderSpotlight } from './image-spotlight'
+import type { SpotlightRenderOptions } from './image-spotlight'
 
 export const SPOTLIGHT_ANIMATION_FPS = 30
 
@@ -31,7 +31,8 @@ export function computeAnimationFrameCount(
   holdDurationSec: number,
   fps: number = SPOTLIGHT_ANIMATION_FPS,
 ): number {
-  const totalSec = Math.max(0, transitionDurationSec) + Math.max(0, holdDurationSec)
+  const totalSec =
+    Math.max(0, transitionDurationSec) + Math.max(0, holdDurationSec)
   return Math.max(1, Math.ceil(totalSec * fps))
 }
 
@@ -75,7 +76,10 @@ function getSupportedVideoMimeType(): string | null {
     'video/webm',
   ]
   for (const mime of candidates) {
-    if (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported(mime)) {
+    if (
+      typeof MediaRecorder !== 'undefined' &&
+      MediaRecorder.isTypeSupported(mime)
+    ) {
       return mime
     }
   }
@@ -119,7 +123,12 @@ function buildRenderOptionsAtFrame(
 function createExportCanvas(
   img: HTMLImageElement,
   magnifier: SpotlightRenderOptions['magnifier'],
-): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; w: number; h: number } {
+): {
+  canvas: HTMLCanvasElement
+  ctx: CanvasRenderingContext2D
+  w: number
+  h: number
+} {
   const w = img.naturalWidth
   const h = img.naturalHeight
   const ext = magnifierExtent(magnifier ?? null, w, h)
@@ -157,7 +166,12 @@ async function exportSpotlightAnimationGif(
     )
     renderSpotlight(ctx, img, w, h, frameOptions)
 
-    const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    const { data, width, height } = ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    )
     if (palette === null) {
       palette = quantize(data, 256)
     }
@@ -196,7 +210,7 @@ async function exportSpotlightAnimationVideo(
   )
   const { canvas, ctx, w, h } = createExportCanvas(img, options.magnifier)
   const stream = canvas.captureStream(fps)
-  const chunks: Blob[] = []
+  const chunks: Array<Blob> = []
 
   const recorder = new MediaRecorder(stream, { mimeType })
   const recorded = new Promise<Blob>((resolve, reject) => {
@@ -254,7 +268,9 @@ export async function exportSpotlightAnimation(
     throw new Error('Image has no dimensions')
   }
   if (!hasSpotlightContent(options)) {
-    throw new Error('Add at least one shape or magnifier before exporting animation')
+    throw new Error(
+      'Add at least one shape or magnifier before exporting animation',
+    )
   }
 
   if (options.format === 'gif') {

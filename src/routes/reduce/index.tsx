@@ -3,9 +3,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { FileUploadArea } from '../convert/-components/FileUploadArea'
 import { ImagePreviewGrid } from '../convert/-components/ImagePreviewGrid'
 import { OutputFormatSelector } from '../crop/-components/OutputFormatSelector'
+import { ReduceControls } from '../transform/-components/ReduceControls'
 import { ReduceImagePageHeader } from './-components/ReduceImagePageHeader'
 import { ReduceActions } from './-components/ReduceActions'
-import { ReduceControls } from '../transform/-components/ReduceControls'
 import type { ImageFile } from '@/components/ImagePreview'
 
 const SUPPORTED_FORMATS = ['webp', 'png', 'jpg', 'avif', 'ico']

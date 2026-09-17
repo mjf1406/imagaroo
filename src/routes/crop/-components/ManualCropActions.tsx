@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import type { ImageFile } from '@/components/ImagePreview'
-import type { CropRect, CropOutputFormat } from '@/lib/image-cropper'
+import type { CropOutputFormat, CropRect } from '@/lib/image-cropper'
+import { Button } from '@/components/ui/button'
 import { cropImageToRect } from '@/lib/image-cropper'
 import { changeFileExtension } from '@/lib/image-converter'
 import { downloadBlob } from '@/lib/zip-utils'
@@ -24,11 +24,7 @@ export function ManualCropActions({
 }: ManualCropActionsProps) {
   const [isCropping, setIsCropping] = useState(false)
 
-  const canCrop =
-    !!image &&
-    !!cropRect &&
-    cropRect.w >= 1 &&
-    cropRect.h >= 1
+  const canCrop = !!image && !!cropRect && cropRect.w >= 1 && cropRect.h >= 1
 
   const handleCrop = async () => {
     if (!image || !cropRect || !canCrop) return

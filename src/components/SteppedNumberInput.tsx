@@ -1,15 +1,13 @@
 import { Minus, Plus } from 'lucide-react'
-import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { MouseEvent } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 /** Δ for +/- clicks: Ctrl 5, Shift 10, Ctrl+Shift 25; else `baseStep`. Meta counts as Ctrl (macOS). */
-function steppedDeltaFromPointer(
-  e: MouseEvent,
-  baseStep: number,
-): number {
+function steppedDeltaFromPointer(e: MouseEvent, baseStep: number): number {
   const ctrl = e.ctrlKey || e.metaKey
   if (ctrl && e.shiftKey) return 25
   if (e.shiftKey) return 10
@@ -17,14 +15,9 @@ function steppedDeltaFromPointer(
   return baseStep
 }
 
-function parseRaw(
-  raw: string,
-  integerMode: boolean,
-): number | null {
+function parseRaw(raw: string, integerMode: boolean): number | null {
   if (raw === '') return null
-  const n = integerMode
-    ? Number.parseInt(raw, 10)
-    : Number.parseFloat(raw)
+  const n = integerMode ? Number.parseInt(raw, 10) : Number.parseFloat(raw)
   return Number.isNaN(n) ? null : n
 }
 
@@ -117,9 +110,7 @@ export function SteppedNumberInput({
         disabled={disabled}
         className="h-auto w-9 shrink-0 rounded-none rounded-l-lg border-0 border-r border-input"
         aria-label="Decrease value (Ctrl ±5, Shift ±10, Ctrl+Shift ±25)"
-        onClick={(e) =>
-          handleStep(-steppedDeltaFromPointer(e, step))
-        }
+        onClick={(e) => handleStep(-steppedDeltaFromPointer(e, step))}
       >
         <Minus className="size-3.5" aria-hidden />
       </Button>
@@ -145,9 +136,7 @@ export function SteppedNumberInput({
         disabled={disabled}
         className="h-auto w-9 shrink-0 rounded-none rounded-r-lg border-0 border-l border-input"
         aria-label="Increase value (Ctrl ±5, Shift ±10, Ctrl+Shift ±25)"
-        onClick={(e) =>
-          handleStep(steppedDeltaFromPointer(e, step))
-        }
+        onClick={(e) => handleStep(steppedDeltaFromPointer(e, step))}
       >
         <Plus className="size-3.5" aria-hidden />
       </Button>

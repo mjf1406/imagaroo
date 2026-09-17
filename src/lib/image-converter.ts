@@ -66,7 +66,7 @@ export async function convertImage(
   file: File,
   targetFormat: string,
   quality: number = 0.92,
-  backgroundColor?: string
+  backgroundColor?: string,
 ): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -137,7 +137,7 @@ export async function convertImage(
             }
           },
           mimeType,
-          outputFormat === 'png' ? undefined : quality
+          outputFormat === 'png' ? undefined : quality,
         )
       }
 
@@ -172,7 +172,7 @@ export function getFileExtension(filename: string): string {
  */
 export function changeFileExtension(
   filename: string,
-  newExtension: string
+  newExtension: string,
 ): string {
   const parts = filename.split('.')
   parts[parts.length - 1] = newExtension
@@ -183,7 +183,15 @@ export function changeFileExtension(
  * Validates if a file is a supported image type
  */
 export function isValidImageType(file: File): boolean {
-  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif', 'image/x-icon', 'image/vnd.microsoft.icon']
+  const validTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+    'image/avif',
+    'image/x-icon',
+    'image/vnd.microsoft.icon',
+  ]
   const extension = getFileExtension(file.name).toLowerCase()
   const validExtensions = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'ico']
 

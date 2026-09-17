@@ -7,27 +7,32 @@ import type {
 } from './SpotlightControls'
 import type { ImageFile } from '@/components/ImagePreview'
 import type { MagnifierFrame } from '@/lib/image-magnifier'
-import {
-  exportSpotlightAnimation,
-  spotlightAnimationFilename,
-} from '@/lib/image-spotlight-animation'
 import type {
   SpotlightEffect,
   SpotlightFocusArea,
   SpotlightShape,
 } from '@/lib/image-spotlight'
+import {
+  exportSpotlightAnimation,
+  spotlightAnimationFilename,
+} from '@/lib/image-spotlight-animation'
 import { exportSpotlight } from '@/lib/image-spotlight'
 import { Button } from '@/components/ui/button'
 import { downloadBlob } from '@/lib/zip-utils'
 
-function spotlightFilename(originalName: string, format: SpotlightOutputFormat): string {
+function spotlightFilename(
+  originalName: string,
+  format: SpotlightOutputFormat,
+): string {
   const dot = originalName.lastIndexOf('.')
   const base = dot >= 0 ? originalName.slice(0, dot) : originalName
   const ext = format === 'jpg' ? 'jpg' : format
   return `${base}-spotlight.${ext}`
 }
 
-async function loadImageFromPreview(preview: string): Promise<HTMLImageElement> {
+async function loadImageFromPreview(
+  preview: string,
+): Promise<HTMLImageElement> {
   const img = new Image()
   img.decoding = 'async'
   await new Promise<void>((resolve, reject) => {
