@@ -66,6 +66,10 @@ env.useWasmCache = true
 if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.numThreads = 1
   env.backends.onnx.wasm.proxy = false
+  const onnxWebVersion = env.backends.onnx.versions?.web
+  if (onnxWebVersion) {
+    env.backends.onnx.wasm.wasmPaths = `https://cdn.jsdelivr.net/npm/onnxruntime-web@${onnxWebVersion}/dist/`
+  }
 }
 
 let capabilitiesPromise: Promise<DeviceCapabilities> | null = null

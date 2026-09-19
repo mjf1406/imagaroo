@@ -11,9 +11,13 @@ Remove Background and Transform run segmentation models entirely in your browser
 - **Standard:** [BRIA RMBG-1.4](https://huggingface.co/briaai/RMBG-1.4). Source-available for non-commercial use. Commercial use needs a [BRIA license](https://bria.ai/bria-huggingface-model-license-agreement/).
 - **Quality:** a browser-ready [BiRefNet](https://github.com/ZhengPeng7/BiRefNet) export (MIT). Shown only when WebGPU and GPU limits look sufficient.
 
-The first run downloads the selected ONNX weights from Hugging Face (about 45 MB for Standard, 115 MB for Quality) and stores them in the browser cache. Inference prefers WebGPU and falls back to quantized WASM. Image bytes are not uploaded.
+The first run downloads the selected ONNX weights from Hugging Face (about 45 MB for Standard, 115 MB for Quality) and stores them in the browser cache. Inference prefers WebGPU and falls back to quantized WASM. WASM fallback loads ONNX Runtime from jsDelivr (~27 MB, cached by the browser). Image bytes are not uploaded.
 
 ## Change Log
+
+### 2026/09/19
+
+- DX: load ONNX Runtime WASM from jsDelivr so Cloudflare Pages is not blocked by the 25 MiB file limit
 
 ### 2026/09/17
 
