@@ -1,4 +1,4 @@
-import { readdirSync, statSync, unlinkSync } from 'node:fs'
+import { existsSync, readdirSync, statSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { URL, fileURLToPath } from 'node:url'
 
@@ -25,23 +25,31 @@ function isOrtWasmAsset(fileName: string): boolean {
   return baseName.startsWith('ort-wasm') && baseName.endsWith('.wasm')
 }
 
+function resolveOutDir(root: string, outDir: string): string {
+  if (outDir.startsWith('/') || /^[A-Za-z]:[\\/]/.test(outDir)) {
+    return outDir
+  }
+  return join(root, outDir)
+}
+
 /**
  * onnxruntime-web uses `new URL('ort-wasm…wasm', import.meta.url)`, which Vite
  * copies into dist (~26 MiB). Cloudflare Pages rejects files over 25 MiB.
  * Runtime loads that WASM from jsDelivr via `env.backends.onnx.wasm.wasmPaths`.
+ *
+ * Worker bundling closes before `dist` exists. Only the main build should scan
+ * the written output.
  */
-function stripOrtWasm(): Plugin {
+function stripOrtWasm(options: { checkOutput?: boolean } = {}): Plugin {
   let outDir = ''
+  const checkOutput = options.checkOutput === true
 
   return {
-    name: 'strip-ort-wasm',
+    name: checkOutput ? 'strip-ort-wasm' : 'strip-ort-wasm-worker',
     enforce: 'pre',
     apply: 'build',
     configResolved(config) {
-      outDir = config.build.outDir
-      if (!outDir.startsWith('/') && !/^[A-Za-z]:[\\/]/.test(outDir)) {
-        outDir = join(config.root, outDir)
-      }
+      outDir = resolveOutDir(config.root, config.build.outDir)
     },
     transform(code, id) {
       const normalizedId = id.replace(/\\/g, '/')
@@ -64,7 +72,7 @@ function stripOrtWasm(): Plugin {
       }
     },
     closeBundle() {
-      if (!outDir) {
+      if (!checkOutput || !outDir || !existsSync(outDir)) {
         return
       }
       for (const filePath of listFiles(outDir)) {
@@ -103,7 +111,7 @@ export default defineConfig({
     ignorePatterns: ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock'],
   },
   plugins: lazyPlugins(() => [
-    stripOrtWasm(),
+    stripOrtWasm({ checkOutput: true }),
     devtools(),
     tanstackRouter({
       target: 'react',
